@@ -1,0 +1,18 @@
+# Ignore system files and build artifacts
+.DS_Store
+Debug/
+Release/
+bin/
+obj/
+*.exe
+*.pdb
+*.dll
+*.log
+
+# Ignore Visual Studio files
+.vs/
+*.user
+*.suo
+
+# Ignore other git repositories
+brainalarm/
