@@ -38,7 +38,6 @@ def suBAR(signal, wavelet='sym4', level=5, num_surrogates=1000, alpha=0.05):
     """
     SuBAR implementation for single-channel EEG artifact removal.
     """
-    N = len(signal)
     coeffs = modwt(signal, wavelet, level)
     surrogates = generate_surrogate(signal, num_surrogates)
     
