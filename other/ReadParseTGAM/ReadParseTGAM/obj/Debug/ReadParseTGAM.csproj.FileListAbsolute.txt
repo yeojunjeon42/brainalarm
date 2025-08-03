@@ -1,8 +1,0 @@
-E:/VSProject/ReadParseTGAM/ReadParseTGAM/bin/Debug/ReadParseTGAM.exe.config
-E:/VSProject/ReadParseTGAM/ReadParseTGAM/bin/Debug/ReadParseTGAM.exe
-E:/VSProject/ReadParseTGAM/ReadParseTGAM/bin/Debug/ReadParseTGAM.pdb
-E:/VSProject/ReadParseTGAM/ReadParseTGAM/obj/Debug/ReadParseTGAM.csprojResolveAssemblyReference.cache
-E:/VSProject/ReadParseTGAM/ReadParseTGAM/obj/Debug/ReadParseTGAM.exe
-E:/VSProject/ReadParseTGAM/ReadParseTGAM/obj/Debug/ReadParseTGAM.pdb
-/Users/joseph/Desktop/NeuroRise/Repository/ReadParseTGAM/ReadParseTGAM/obj/Debug/ReadParseTGAM.exe
-/Users/joseph/Desktop/NeuroRise/Repository/ReadParseTGAM/ReadParseTGAM/obj/Debug/ReadParseTGAM.pdb

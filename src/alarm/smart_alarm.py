@@ -1,13 +1,15 @@
 import datetime
 import time
-from xgboost.sklearn import XGBClassifier
+from xgboost import XGBClassifier
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'processing'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'hardware'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'display'))
 
 from feature_extract import exfeature
-from gpio_time_setter import settime, settime_fixed
+from vibration_controller import trigger_vibration_alarm
+from oled_time_setter import settime, settime_fixed
 
 
 # EEG 데이터 수집 및 전처리 함수
@@ -18,8 +20,11 @@ def get_latest_sleep_data():
 
 # 알람 작동
 def trigger_alarm():
-    print("알람")
-    # 실제 알람 구현: 사운드, LED 등 추가 가능
+    """
+    Trigger vibration alarm using the hardware vibration controller.
+    Vibrates in 1-second on/off cycles until reset button is pressed.
+    """
+    trigger_vibration_alarm(vibrate_duration=1.0, pause_duration=0.2)
 
 # wake window 내에 있는지 확인
 def is_within_wake_window(current_time, wake_time, window_min=15):
@@ -70,7 +75,8 @@ if settime_fixed:
 
     # 모델 로드
     sleep_stage_model = XGBClassifier()
-    sleep_stage_model.load_model('xgb_model.json')
+    model_path = os.path.join(os.path.dirname(__file__), '..', '..', 'models', 'xgb_model.json')
+    sleep_stage_model.load_model(model_path)
 
 
 
