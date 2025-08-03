@@ -1,0 +1,14 @@
+/Users/joseph/Desktop/NeuroRise/Repository/ReadParseTGAM/ReadParseTGAM/obj/Debug/net5.0/ReadParseTGAM.csprojAssemblyReference.cache
+/Users/joseph/Desktop/NeuroRise/Repository/ReadParseTGAM/ReadParseTGAM/obj/Debug/net5.0/ReadParseTGAM.GeneratedMSBuildEditorConfig.editorconfig
+/Users/joseph/Desktop/NeuroRise/Repository/ReadParseTGAM/ReadParseTGAM/obj/Debug/net5.0/ReadParseTGAM.csproj.CoreCompileInputs.cache
+/Users/joseph/Desktop/NeuroRise/Repository/ReadParseTGAM/ReadParseTGAM/bin/Debug/net5.0/ReadParseTGAM.dll.config
+/Users/joseph/Desktop/NeuroRise/Repository/ReadParseTGAM/ReadParseTGAM/bin/Debug/net5.0/ReadParseTGAM.deps.json
+/Users/joseph/Desktop/NeuroRise/Repository/ReadParseTGAM/ReadParseTGAM/bin/Debug/net5.0/ReadParseTGAM.runtimeconfig.json
+/Users/joseph/Desktop/NeuroRise/Repository/ReadParseTGAM/ReadParseTGAM/bin/Debug/net5.0/ReadParseTGAM.runtimeconfig.dev.json
+/Users/joseph/Desktop/NeuroRise/Repository/ReadParseTGAM/ReadParseTGAM/bin/Debug/net5.0/ReadParseTGAM.dll
+/Users/joseph/Desktop/NeuroRise/Repository/ReadParseTGAM/ReadParseTGAM/bin/Debug/net5.0/ref/ReadParseTGAM.dll
+/Users/joseph/Desktop/NeuroRise/Repository/ReadParseTGAM/ReadParseTGAM/bin/Debug/net5.0/ReadParseTGAM.pdb
+/Users/joseph/Desktop/NeuroRise/Repository/ReadParseTGAM/ReadParseTGAM/obj/Debug/net5.0/ReadParseTGAM.dll
+/Users/joseph/Desktop/NeuroRise/Repository/ReadParseTGAM/ReadParseTGAM/obj/Debug/net5.0/ref/ReadParseTGAM.dll
+/Users/joseph/Desktop/NeuroRise/Repository/ReadParseTGAM/ReadParseTGAM/obj/Debug/net5.0/ReadParseTGAM.pdb
+/Users/joseph/Desktop/NeuroRise/Repository/ReadParseTGAM/ReadParseTGAM/obj/Debug/net5.0/ReadParseTGAM.genruntimeconfig.cache
