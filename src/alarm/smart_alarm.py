@@ -3,7 +3,7 @@ import time
 from sklearn.preprocessing import StandardScaler
 from processing.feature_extract import exfeature
 from hardware.vibration_controller import trigger_vibration_alarm
-from SuBAR import suBAR
+from src.processing.signal_processing import suBAR
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'processing'))

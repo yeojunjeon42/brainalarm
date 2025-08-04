@@ -16,7 +16,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src', 'hardware'))
 
 try:
-    from vibration_controller import VibrationController, trigger_vibration_alarm, vibrate_once
+    from src.hardware.vibration_controller import VibrationController, trigger_vibration_alarm, vibrate_once
     HARDWARE_AVAILABLE = True
     print("✅ Hardware modules loaded successfully!")
 except ImportError as e:
