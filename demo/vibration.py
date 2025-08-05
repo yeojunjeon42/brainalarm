@@ -13,10 +13,10 @@ import sys
 import os
 
 # Add paths to import our hardware modules
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src', 'hardware'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 try:
-    from vibration_controller import VibrationController, trigger_vibration_alarm, vibrate_once
+    from hardware.vibration_controller import VibrationController, trigger_vibration_alarm, vibrate_once
     HARDWARE_AVAILABLE = True
     print("✅ Hardware modules loaded successfully!")
 except ImportError as e:
@@ -78,36 +78,63 @@ def test_button_reading():
     print("🔴 Reset Button Test")
     print("="*45)
     print("Press and hold RESET BUTTON (pin 4) - monitoring for 10 seconds...")
+    print("💡 TIP: Make sure button is connected between pin 4 and GND")
     
     try:
         import RPi.GPIO as GPIO
+        
+        # Clean up any previous GPIO setup
+        GPIO.cleanup()
         
         # Setup button pin
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         
+        # Wait a moment for GPIO to stabilize
+        time.sleep(0.5)
+        
         start_time = time.time()
         last_state = GPIO.input(4)
         press_count = 0
         
+        print(f"🔴 Initial button state: {'HIGH (not pressed)' if last_state else 'LOW (pressed)'}")
+        print("🔴 Starting button monitoring...")
+        
         while time.time() - start_time < 10:
             current_state = GPIO.input(4)
             
+            # Detect falling edge (button press)
             if last_state == 1 and current_state == 0:
                 press_count += 1
                 print(f"🔴 Button pressed! (count: {press_count})")
+            # Detect rising edge (button release)
             elif last_state == 0 and current_state == 1:
                 print("🔴 Button released!")
                 
             last_state = current_state
-            time.sleep(0.1)
+            time.sleep(0.05)  # Faster polling for better responsiveness
         
         print(f"✅ Button test completed! Total presses: {press_count}")
+        
+        # Clean up
+        GPIO.cleanup()
         
     except Exception as e:
         print(f"❌ Hardware error: {e}")
         print("Check button connection on pin 4!")
+        print("Button should be connected between GPIO 4 and GND")
+        
+        # Try to show current button state for debugging
+        try:
+            GPIO.setwarnings(False)
+            GPIO.setmode(GPIO.BCM)
+            GPIO.setup(4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            current_state = GPIO.input(4)
+            print(f"🔍 Current button state: {'HIGH (not pressed)' if current_state else 'LOW (pressed)'}")
+            GPIO.cleanup()
+        except:
+            print("🔍 Could not read button state for debugging")
 
 def main():
     """Run hardware vibration tests"""
