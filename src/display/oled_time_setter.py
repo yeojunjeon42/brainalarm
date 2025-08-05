@@ -23,6 +23,37 @@ settime_fixed = False  # Whether the time has been confirmed/set
 wake_window_minutes = 30  # Wake window in minutes (0-90)
 wake_window_fixed = False  # Whether the wake window has been set
 
+
+# Convenience functions for smart alarm integration
+def get_set_time_info():
+    """
+    Get the current set time information for smart alarm integration
+    
+    Returns:
+        dict: Contains settime (unix timestamp), settime_fixed (bool), 
+              and formatted time info
+    """
+    if settime_fixed:
+        set_dt = datetime.datetime.fromtimestamp(settime)
+        return {
+            'settime': settime,
+            'settime_fixed': settime_fixed,
+            'hour': set_dt.hour,
+            'minute': set_dt.minute,
+            'formatted': set_dt.strftime('%I:%M %p')
+        }
+    else:
+        return {
+            'settime': settime,
+            'settime_fixed': False,
+            'hour': None,
+            'minute': None,
+            'formatted': 'Not Set'
+        }
+
+def is_time_set():
+    """Check if wake time has been set and confirmed"""
+    return settime_fixed
 class OLEDTimeSetter:
     def __init__(self):
         # GPIO Setup
@@ -367,40 +398,6 @@ class OLEDTimeSetter:
         GPIO.cleanup()
         print("Cleanup completed")
 
-# Convenience functions for smart alarm integration
-def get_set_time_info():
-    """
-    Get the current set time information for smart alarm integration
-    
-    Returns:
-        dict: Contains settime (unix timestamp), settime_fixed (bool), 
-              wake_window_minutes, and formatted time info
-    """
-    if settime_fixed:
-        set_dt = datetime.datetime.fromtimestamp(settime)
-        return {
-            'settime': settime,
-            'settime_fixed': settime_fixed,
-            'hour': set_dt.hour,
-            'minute': set_dt.minute,
-            'formatted': set_dt.strftime('%I:%M %p'),
-            'wake_window_minutes': wake_window_minutes,
-            'wake_window_fixed': wake_window_fixed
-        }
-    else:
-        return {
-            'settime': settime,
-            'settime_fixed': False,
-            'hour': None,
-            'minute': None,
-            'formatted': 'Not Set',
-            'wake_window_minutes': wake_window_minutes if wake_window_fixed else None,
-            'wake_window_fixed': wake_window_fixed
-        }
-
-def is_time_set():
-    """Check if wake time has been set and confirmed"""
-    return settime_fixed
 
 def get_wake_window():
     """Get the wake window in minutes"""
