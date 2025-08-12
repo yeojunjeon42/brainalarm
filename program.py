@@ -4,7 +4,6 @@ import pandas as pd
 from xgboost.sklearn import XGBClassifier
 from display.oled_time_setter import settime, is_time_set, OLEDTimeSetter
 from src.alarm.smart_alarm import smart_alarm_loop
-import sys
 import os
 
 # EEG 데이터 파일 경로 / eeg데이터가 동일한 디렉토리에 있어야 함
