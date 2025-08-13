@@ -198,7 +198,7 @@ class OLEDDemo:
             print(f"❌ Vibration motor error: {e}")
         
         # Test reset button
-        print("🔴 Testing reset button (press button within 5 seconds)...")
+        print("🔴 Testing reset button (press button within 20 seconds)...")
         try:
             import RPi.GPIO as GPIO
             GPIO.setwarnings(False)
@@ -209,7 +209,7 @@ class OLEDDemo:
             last_state = GPIO.input(4)
             press_count = 0
             
-            while time.time() - start_time < 5:
+            while time.time() - start_time < 20:
                 current_state = GPIO.input(4)
                 if last_state == 1 and current_state == 0:
                     press_count += 1
