@@ -2,7 +2,7 @@ import datetime
 import time
 import pandas as pd
 from xgboost.sklearn import XGBClassifier
-from display.oled_time_setter import settime, is_time_set, OLEDTimeSetter
+from src.display.oled_time_setter import settime, is_time_set, OLEDTimeSetter
 from src.alarm.smart_alarm import smart_alarm_loop
 import os
 

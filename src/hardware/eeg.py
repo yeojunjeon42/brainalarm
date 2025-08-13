@@ -342,8 +342,8 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description='EEG Data Reader for ThinkGear Protocol')
-    parser.add_argument('--port', '-p', default='/dev/ttyS0', 
-                       help='Serial port (default: /dev/ttyS0)')
+    parser.add_argument('--port', '-p', default='/dev/serial0', 
+                       help='Serial port (default: /dev/serial0)')
     parser.add_argument('--baudrate', '-b', type=int, default=57600,
                        help='Baud rate (default: 57600)')
     parser.add_argument('--mode', '-m', choices=['hex', 'monitor'], default='hex',
