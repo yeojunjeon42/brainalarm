@@ -29,14 +29,13 @@ def is_within_wake_window(current_time, wake_time, window_min=15):
 # 대기 함수
 def wait_until_start(start_datetime):
     print(f"brainalarm 시작 예정 시각: {start_datetime.strftime('%H:%M:%S')}")
+    print(datetime.datetime.now().strftime('%H:%M:%S'))
     while datetime.datetime.now() < (start_datetime):
         time.sleep(30)
 
 # 메인 함수
 def smart_alarm_loop(model, start_time, wake_time, wake_window_min, args):
     alarm_triggered = False
-    #알람 돌아가기 시작한 시간
-    begin_time = datetime.datetime.now()
 
     # 1. 설정된 시간까지 대기
     wait_until_start(start_time)
@@ -59,7 +58,9 @@ def smart_alarm_loop(model, start_time, wake_time, wake_window_min, args):
             if predicted_stage == 1:
                 trigger_alarm()
                 alarm_triggered = True
-        else:
+        if now >= wake_time:
+            trigger_alarm()
+            alarm_triggered = True
             eeg_reader.disconnect()
             print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 기상 윈도우 종료됨.")
             break
