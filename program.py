@@ -7,6 +7,8 @@ from src.alarm.smart_alarm import smart_alarm_loop
 import argparse
 from src.hardware.eeg import EEGReader
 import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'models'))
 
 
 system = OLEDTimeSetter()
@@ -47,7 +49,7 @@ if system.set_time_fixed:
     eeg_reader = EEGReader(port=args.port, baudrate=args.baudrate)
 
     # 모델 로드
-    sleep_stage_model = joblib.load('models.final_model.joblib')
+    sleep_stage_model = joblib.load('final_model.joblib')
 
 
 
