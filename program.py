@@ -9,7 +9,7 @@ from src.hardware.eeg import EEGReader
 import os
 import sys
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, 'models.final_model.joblib')
+MODEL_PATH = os.path.join(BASE_DIR, 'models/final_model.joblib')
 
 
 system = OLEDTimeSetter()
