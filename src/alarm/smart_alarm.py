@@ -48,6 +48,7 @@ def smart_alarm_loop(model, start_time, wake_time, wake_window_min, args):
 
     # 2. smart alarm 작동
     while not alarm_triggered:
+        print('ddddd')
         now = datetime.datetime.now().time()
 
         if is_within_wake_window(now, wake_time, wake_window_min):
