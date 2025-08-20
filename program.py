@@ -2,7 +2,7 @@ import datetime
 import time
 import pandas as pd
 import joblib
-from src.display.oled_time_setter import is_time_set, OLEDTimeSetter
+from src.display.oled_time_setter import OLEDTimeSetter
 from src.alarm.smart_alarm import smart_alarm_loop
 import argparse
 from src.hardware.eeg import EEGReader
