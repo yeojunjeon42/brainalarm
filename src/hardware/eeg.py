@@ -11,7 +11,7 @@ import sys
 from enum import Enum
 from collections import deque
 from typing import Optional, Callable, Any
-from src.processing.feature_extract import exfeature
+from processing.feature_extract import exfeature
 
 
 class ParserState(Enum):
