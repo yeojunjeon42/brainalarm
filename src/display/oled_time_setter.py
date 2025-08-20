@@ -255,7 +255,7 @@ class OLEDTimeSetter:
         self.set_is_pm = True
         self.time_is_blinking = True
         
-        self.settime_fixed = False
+        self.set_time_fixed = False
         wake_window_fixed = False
         
         print("Reset to wake window selection")
@@ -291,7 +291,7 @@ class OLEDTimeSetter:
         today = datetime.date.today()
         set_datetime = datetime.datetime.combine(today, datetime.time(self.set_hour, self.set_minute))
         settime = set_datetime.timestamp()
-        self.settime_fixed = True
+        self.set_time_fixed = True
         
         # Stop blinking since time is now set
         self.time_is_blinking = False
