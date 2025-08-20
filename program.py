@@ -8,8 +8,6 @@ import argparse
 from src.hardware.eeg import EEGReader
 import os
 
-# EEG 데이터 파일 경로 / eeg데이터가 동일한 디렉토리에 있어야 함
-eeg_data = pd.read_csv('eeg_data.csv')
 
 system = OLEDTimeSetter()
 system.run()
