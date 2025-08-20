@@ -6,7 +6,6 @@ Based on NeuroSky ThinkGear packet structure.
 """
 import os
 import sys
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 import numpy as np
 import serial
 import time
@@ -14,7 +13,7 @@ import sys
 from enum import Enum
 from collections import deque
 from typing import Optional, Callable, Any
-from processing.feature_extract import exfeature
+from ..processing.feature_extract import exfeature
 
 
 class ParserState(Enum):
