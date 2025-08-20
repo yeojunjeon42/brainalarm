@@ -4,12 +4,14 @@ EEG Data Reader for ThinkGear Protocol
 Reads and displays raw hex data from ThinkGear EEG devices via serial communication.
 Based on NeuroSky ThinkGear packet structure.
 """
-
+import numpy as np
 import serial
 import time
 import sys
 from enum import Enum
+from collections import deque
 from typing import Optional, Callable, Any
+from src.processing.feature_extract import exfeature
 
 
 class ParserState(Enum):
@@ -187,6 +189,32 @@ class ThinkGearParser:
             else:
                 break
 
+class EpochFeatureExtractor:
+    def __init__(self, fs=512, epoch_duration=30):
+        """
+        Args:
+            fs (int): Sampling frequency (default 512Hz for TGAM)
+            epoch_duration (int): Epoch length in seconds (default 30s)
+        """
+        self.fs = fs
+        self.epoch_duration = epoch_duration
+        self.buffer_size = fs * epoch_duration
+        self.buffer = deque(maxlen=self.buffer_size)  # raw EEG data 저장
+        
+    def add_sample(self, sample):
+        """새로운 raw EEG 샘플 추가"""
+        self.buffer.append(sample)
+        
+        # 버퍼가 가득 차면 특징 추출
+        if len(self.buffer) == self.buffer_size:
+            data = np.array(self.buffer, dtype=np.float32)
+            features = exfeature(data, fs=self.fs)
+            
+            # 버퍼 초기화 (슬라이딩 윈도우 원한다면 주석 처리)
+            self.buffer.clear()
+            
+            return features
+        return None
 
 class EEGReader:
     """EEG Data Reader with hex display functionality"""
@@ -197,6 +225,8 @@ class EEGReader:
         self.serial_conn: Optional[serial.Serial] = None
         self.parser = ThinkGearParser(ParserType.PACKETS, self._handle_data_value)
         self.running = False
+        self.feature_extractor = EpochFeatureExtractor(fs=512, epoch_duration=30)
+        self.feature = None
         
     def connect(self) -> bool:
         """
@@ -246,6 +276,7 @@ class EEGReader:
         elif code == CODE_BLINK_STRENGTH:
             blink = value[0] if isinstance(value, (bytes, bytearray)) else value
             print(f"[{timestamp}] Blink Strength: {blink}")
+
             
         elif code == CODE_RAW_SIGNAL:
             if isinstance(value, (bytes, bytearray)) and len(value) >= 2:
@@ -253,11 +284,13 @@ class EEGReader:
             else:
                 raw_val = value
             print(f"[{timestamp}] Raw Signal: {raw_val}")
+            self.feature = self.feature_extractor.add_sample(raw_val)
+            
             
         else:
             value_hex = ' '.join([f'{b:02X}' for b in value]) if isinstance(value, (bytes, bytearray)) else f'{value:02X}'
             print(f"[{timestamp}] Code 0x{code:02X} (Level {extended_code_level}): {value_hex}")
-    
+
     def display_raw_hex(self, buffer_size: int = 32):
         """
         Display raw hex data from serial stream

@@ -189,30 +189,30 @@ class OLEDTimeSetter:
             elif display_hour > 12:
                 display_hour = display_hour - 12
         
-        time_text = "{:02d}:{:02d}".format(display_hour, self.set_minute)
-        ampm_text = "PM" if self.set_is_pm else "AM"
-        
-        # Center the time text
-        bbox = self.draw.textbbox((0, 0), time_text, font=self.time_font)
-        time_width = bbox[2] - bbox[0]
-        time_x = (128 - time_width) // 2
-        time_y = 18  # Slightly higher for better centering
-        
-        # Draw time
-        self.draw.text((time_x, time_y), time_text, font=self.time_font, fill=255)
-        
-        # Draw AM/PM below time
-        ampm_bbox = self.draw.textbbox((0, 0), ampm_text, font=self.ampm_font)
-        ampm_width = ampm_bbox[2] - ampm_bbox[0]
-        ampm_x = (128 - ampm_width) // 2
-        self.draw.text((ampm_x, time_y + 25), ampm_text, font=self.ampm_font, fill=255)
-        
-        # Show window info at bottom
-        window_info = "{}min before".format(self.wake_window)
-        window_bbox = self.draw.textbbox((0, 0), window_info, font=self.ampm_font)
-        window_width = window_bbox[2] - window_bbox[0]
-        window_x = (128 - window_width) // 2
-        self.draw.text((window_x, 54), window_info, font=self.ampm_font, fill=255)
+            time_text = "{:02d}:{:02d}".format(display_hour, self.set_minute)
+            ampm_text = "PM" if self.set_is_pm else "AM"
+            
+            # Center the time text
+            bbox = self.draw.textbbox((0, 0), time_text, font=self.time_font)
+            time_width = bbox[2] - bbox[0]
+            time_x = (128 - time_width) // 2
+            time_y = 18  # Slightly higher for better centering
+            
+            # Draw time
+            self.draw.text((time_x, time_y), time_text, font=self.time_font, fill=255)
+            
+            # Draw AM/PM below time
+            ampm_bbox = self.draw.textbbox((0, 0), ampm_text, font=self.ampm_font)
+            ampm_width = ampm_bbox[2] - ampm_bbox[0]
+            ampm_x = (128 - ampm_width) // 2
+            self.draw.text((ampm_x, time_y + 25), ampm_text, font=self.ampm_font, fill=255)
+            
+            # Show window info at bottom
+            window_info = "{}min before".format(self.wake_window)
+            window_bbox = self.draw.textbbox((0, 0), window_info, font=self.ampm_font)
+            window_width = window_bbox[2] - window_bbox[0]
+            window_x = (128 - window_width) // 2
+            self.draw.text((window_x, 54), window_info, font=self.ampm_font, fill=255)
     
     def adjust_window(self, increment):
         """Adjust wake window by increment (in 5-minute steps)"""
