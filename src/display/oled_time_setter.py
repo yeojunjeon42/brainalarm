@@ -19,41 +19,37 @@ import adafruit_ssd1306
 
 # Global variables for smart alarm integration
 settime = time.time()  # Unix timestamp of set wake time
-settime_fixed = False  # Whether the time has been confirmed/set
 wake_window_minutes = 30  # Wake window in minutes (0-90)
 wake_window_fixed = False  # Whether the wake window has been set
 
 
 # Convenience functions for smart alarm integration
-def get_set_time_info():
-    """
-    Get the current set time information for smart alarm integration
+# def get_set_time_info():
+#     """
+#     Get the current set time information for smart alarm integration
     
-    Returns:
-        dict: Contains settime (unix timestamp), settime_fixed (bool), 
-              and formatted time info
-    """
-    if settime_fixed:
-        set_dt = datetime.datetime.fromtimestamp(settime)
-        return {
-            'settime': settime,
-            'settime_fixed': settime_fixed,
-            'hour': set_dt.hour,
-            'minute': set_dt.minute,
-            'formatted': set_dt.strftime('%I:%M %p')
-        }
-    else:
-        return {
-            'settime': settime,
-            'settime_fixed': False,
-            'hour': None,
-            'minute': None,
-            'formatted': 'Not Set'
-        }
+#     Returns:
+#         dict: Contains settime (unix timestamp), settime_fixed (bool), 
+#               and formatted time info
+#     """
+#     if settime_fixed:
+#         set_dt = datetime.datetime.fromtimestamp(settime)
+#         return {
+#             'settime': settime,
+#             'settime_fixed': settime_fixed,
+#             'hour': set_dt.hour,
+#             'minute': set_dt.minute,
+#             'formatted': set_dt.strftime('%I:%M %p')
+#         }
+#     else:
+#         return {
+#             'settime': settime,
+#             'settime_fixed': False,
+#             'hour': None,
+#             'minute': None,
+#             'formatted': 'Not Set'
+#         }
 
-def is_time_set():
-    """Check if wake time has been set and confirmed"""
-    return settime_fixed
 class OLEDTimeSetter:
     def __init__(self):
         # GPIO Setup
@@ -85,6 +81,7 @@ class OLEDTimeSetter:
         self.set_hour = 12
         self.set_minute = 0
         self.set_is_pm = True
+        self.set_time_fixed = False  # Whether the time has been confirmed
         
         # Interface state management
         self.interface_mode = 'WINDOW'  # WINDOW, TIME
@@ -249,7 +246,7 @@ class OLEDTimeSetter:
     
     def reset_to_window_selection(self):
         """Reset to window selection interface"""
-        global settime_fixed, wake_window_fixed
+        global  wake_window_fixed
         
         self.interface_mode = 'WINDOW'
         self.wake_window = 30  # Reset to default 30 minutes
@@ -258,7 +255,7 @@ class OLEDTimeSetter:
         self.set_is_pm = True
         self.time_is_blinking = True
         
-        settime_fixed = False
+        self.settime_fixed = False
         wake_window_fixed = False
         
         print("Reset to wake window selection")
@@ -278,7 +275,7 @@ class OLEDTimeSetter:
     
     def confirm_time(self):
         """Confirm the wake time and finish setup"""
-        global settime, settime_fixed
+        global settime
         
         display_hour = self.set_hour
         if display_hour == 0:
@@ -294,7 +291,7 @@ class OLEDTimeSetter:
         today = datetime.date.today()
         set_datetime = datetime.datetime.combine(today, datetime.time(self.set_hour, self.set_minute))
         settime = set_datetime.timestamp()
-        settime_fixed = True
+        self.settime_fixed = True
         
         # Stop blinking since time is now set
         self.time_is_blinking = False
