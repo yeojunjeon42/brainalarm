@@ -1,7 +1,6 @@
 import numpy as np
-import scipy.signal as ss
 from scipy.signal import firwin, filtfilt, welch
-import pywt
+# import pywt
 from scipy.fftpack import fft, ifft
 #fir
 def filter_bandpass(data, hl, fs, numtaps=101):
@@ -121,36 +120,36 @@ def imodwt(coeffs, wavelet):
     """
     return pywt.iswt(coeffs, wavelet)
 
-def suBAR(signal, wavelet='sym4', level=5, num_surrogates=1000, alpha=0.05):
-    """
-    SuBAR implementation for single-channel EEG artifact removal.
-    """
-    coeffs = modwt(signal, wavelet, level)
-    surrogates = generate_surrogate(signal, num_surrogates)
+# def suBAR(signal, wavelet='sym4', level=5, num_surrogates=1000, alpha=0.05):
+#     """
+#     SuBAR implementation for single-channel EEG artifact removal.
+#     """
+#     coeffs = modwt(signal, wavelet, level)
+#     surrogates = generate_surrogate(signal, num_surrogates)
     
-    # Decompose each surrogate
-    surrogate_coeffs = [modwt(s, wavelet, level) for s in surrogates]
+#     # Decompose each surrogate
+#     surrogate_coeffs = [modwt(s, wavelet, level) for s in surrogates]
 
-    # Initialize filtered coefficients
-    filtered_coeffs = []
+#     # Initialize filtered coefficients
+#     filtered_coeffs = []
 
-    for j in range(level):
-        # Gather wavelet coefficients for all surrogates at level j
-        w_sur = np.array([surr[j][1] for surr in surrogate_coeffs])  # detail coefficients
+#     for j in range(level):
+#         # Gather wavelet coefficients for all surrogates at level j
+#         w_sur = np.array([surr[j][1] for surr in surrogate_coeffs])  # detail coefficients
 
-        # Mean and std over surrogates
-        w_mean = np.mean(w_sur, axis=0)
-        w_std = np.std(w_sur, axis=0)
+#         # Mean and std over surrogates
+#         w_mean = np.mean(w_sur, axis=0)
+#         w_std = np.std(w_sur, axis=0)
 
-        # Threshold using Chebyshev’s inequality (95% default)
-        threshold = w_mean + np.sqrt(1/alpha) * w_std
+#         # Threshold using Chebyshev’s inequality (95% default)
+#         threshold = w_mean + np.sqrt(1/alpha) * w_std
 
-        # Compare and filter
-        w_orig = coeffs[j][1]
-        w_filtered = np.where(np.abs(w_orig) > threshold, w_mean, w_orig)
+#         # Compare and filter
+#         w_orig = coeffs[j][1]
+#         w_filtered = np.where(np.abs(w_orig) > threshold, w_mean, w_orig)
 
-        filtered_coeffs.append((coeffs[j][0], w_filtered))  # (approx, detail)
+#         filtered_coeffs.append((coeffs[j][0], w_filtered))  # (approx, detail)
 
-    # Reconstruct cleaned signal
-    cleaned_signal = imodwt(filtered_coeffs, wavelet)
-    return cleaned_signal
+#     # Reconstruct cleaned signal
+#     cleaned_signal = imodwt(filtered_coeffs, wavelet)
+#     return cleaned_signal
