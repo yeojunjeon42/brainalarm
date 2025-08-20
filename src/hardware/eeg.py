@@ -6,6 +6,12 @@ Based on NeuroSky ThinkGear packet structure.
 """
 import os
 import sys
+PROJECT_ROOT = os.path.abspath(os.path.join(
+    os.path.dirname(__file__), '..', '..' 
+))
+
+# 파이썬이 모듈을 검색하는 경로에 프로젝트 루트를 추가합니다.
+sys.path.insert(0, PROJECT_ROOT)
 import numpy as np
 import serial
 import time
@@ -13,7 +19,7 @@ import sys
 from enum import Enum
 from collections import deque
 from typing import Optional, Callable, Any
-from ..processing.feature_extract import exfeature
+from src.processing.feature_extract import exfeature
 
 
 class ParserState(Enum):
