@@ -1,7 +1,7 @@
 import datetime
 import time
 from src.hardware.vibration_controller import trigger_vibration_alarm
-from src.processing.signal_processing import suBAR
+# from src.processing.signal_processing import suBAR
 from src.hardware.eeg import EEGReader
 import argparse
 import sys
