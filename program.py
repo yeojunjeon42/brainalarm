@@ -24,6 +24,7 @@ if system.set_time_fixed:
         h_24 += 12
     elif not is_pm and h_12 == 12:
         h_24 = 0
+    h_24 = h_24 % 24
 
     # ✅ 3. 변환된 24시간제 시간으로 datetime.time 객체 생성
     # 튜플이 아닌, 각 값을 인자로 전달합니다.
