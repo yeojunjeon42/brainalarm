@@ -303,6 +303,9 @@ class OLEDTimeSetter:
         """Handle GPIO inputs in separate thread"""
         while self.running:
             try:
+                if self.set_time_fixed:
+                    time.sleep(0.1)
+                    continue  # Skip GPIO handling if time is already set
                 # Handle reset button (pin 4)
                 reset_state = GPIO.input(self.reset_pin)
                 if self.last_reset_state == 1 and reset_state == 0:  # Button pressed (falling edge)
@@ -373,6 +376,13 @@ class OLEDTimeSetter:
             # Main display update loop
             while self.running:
                 self.update_display()
+                if self.set_time_fixed:
+                    # 시간이 설정되었다면, 3초간 최종 시간을 보여주고 종료
+                    time.sleep(3)
+                    self.running = False # 루프 종료 신호
+                else:
+                    # 시간이 설정되지 않았다면, 0.1초 대기
+                    time.sleep(0.1)
                 time.sleep(0.1)  # Update display 10 times per second
                 
         except KeyboardInterrupt:
