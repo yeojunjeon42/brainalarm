@@ -4,6 +4,9 @@ EEG Data Reader for ThinkGear Protocol
 Reads and displays raw hex data from ThinkGear EEG devices via serial communication.
 Based on NeuroSky ThinkGear packet structure.
 """
+import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 import numpy as np
 import serial
 import time
