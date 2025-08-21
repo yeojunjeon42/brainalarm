@@ -44,7 +44,7 @@ def wait_until_start(start_datetime):
     print(f"brainalarm 시작 예정 시각: {start_datetime.strftime('%H:%M:%S')}")
     print("현재시각:", end = ' ')
     print(datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S'))
-    while datetime.datetime.now() < (start_datetime) -TIMEGAP:
+    while time.time() < start_datetime.timestamp() -TIMEGAP:
         time.sleep(30)
 
 # 메인 함수
