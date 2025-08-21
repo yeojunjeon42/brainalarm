@@ -17,7 +17,6 @@ system.run()
 
 # 사용자 설정
 if system.set_time_fixed:
-    print('dd')
     h_12 = system.set_hour
     m = system.set_minute
     is_pm = system.set_is_pm
