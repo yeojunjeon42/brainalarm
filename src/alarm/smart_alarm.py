@@ -25,22 +25,23 @@ def trigger_alarm():
     trigger_vibration_alarm(vibrate_duration=1.0, pause_duration=0.2)
 
 # wake window 내에 있는지 확인
-#def  is_within_wake_window(datetime.datetime, datetime.time, int)
+#def  is_within_wake_window(datetime.time, datetime.time, int)
 #wake_time은 current_time과 비교하여 알맞는 년, 월, 일, 시간, 분, 초에 설정되어야함
 def is_within_wake_window(current_time, wake_time, window_min=15):
-    current_time_timestamp = current_time.timestamp()
-    wake_time_timestamp = wake_time.timestamp()
-    if current_time_timestamp <= wake_time_timestamp and current_time_timestamp >= wake_time_timestamp + window_min*60:
-        return True
-    return False
-    # current_minutes = current_time.hour * 60 + current_time.minute
-    # wake_minutes = wake_time.hour * 60 + wake_time.minute
-    # return abs(current_minutes - wake_minutes) <= window_min
+    # current_time_timestamp = current_time.timestamp()
+    # wake_time_timestamp = wake_time.timestamp()
+    # if current_time_timestamp <= wake_time_timestamp and current_time_timestamp >= wake_time_timestamp + window_min*60:
+    #     return True
+    # return False
+    current_minutes = current_time.hour * 60 + current_time.minute
+    wake_minutes = wake_time.hour * 60 + wake_time.minute
+    return (-current_minutes + wake_minutes <= window_min) and current_minutes<=wake_minutes
 
 # 대기 함수
 # def wait_until_start(start_datetime : datetime.datetime)
 def wait_until_start(start_datetime):
-    UTC9_start_datetime = datetime.datetime.fromtimestamp(start_datetime.timestamp()+TIMEGAP)
+    UTC9_start_datetime = datetime.datetime.fromtimestamp(start_datetime.timestamp())
+    UTC9_start_datetime = UTC9_start_datetime+datetime.timedelta(hours = 9)
     # 표기는 사용자 설정 시각인 UTC+9으로
     print(f"brainalarm 시작 예정 시각: {UTC9_start_datetime.strftime('%H:%M:%S')}")
     print(datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S'))
