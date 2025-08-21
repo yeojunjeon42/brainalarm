@@ -89,4 +89,4 @@ def smart_alarm_loop(model, start_time, wake_time, wake_window_min, args):
             print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 기상 윈도우 종료됨.")
             break
 
-        time.sleep(30)  # 30초 간격으로 체크
+        time.sleep(0.1)  # 30초 간격으로 체크
