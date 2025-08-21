@@ -6,10 +6,14 @@ from src.hardware.eeg import EEGReader
 import argparse
 import sys
 import os
+from pytz import timezone
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'processing'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'hardware'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'display'))
 
+#All time variables use UTC (python3)
+TIMEGAP = 60*60*9
 
 
 # 알람 작동
@@ -21,19 +25,36 @@ def trigger_alarm():
     trigger_vibration_alarm(vibrate_duration=1.0, pause_duration=0.2)
 
 # wake window 내에 있는지 확인
+#def  is_within_wake_window(datetime.datetime, datetime.time, int)
+#wake_time은 current_time과 비교하여 알맞는 년, 월, 일, 시간, 분, 초에 설정되어야함
 def is_within_wake_window(current_time, wake_time, window_min=15):
-    current_minutes = current_time.hour * 60 + current_time.minute
-    wake_minutes = wake_time.hour * 60 + wake_time.minute
-    return abs(current_minutes - wake_minutes) <= window_min
+    current_time_timestamp = current_time.timestamp()
+    wake_time_timestamp = wake_time.timestamp()
+    if current_time_timestamp <= wake_time_timestamp and current_time_timestamp >= wake_time_timestamp + window_min*60:
+        return True
+    return False
+    # current_minutes = current_time.hour * 60 + current_time.minute
+    # wake_minutes = wake_time.hour * 60 + wake_time.minute
+    # return abs(current_minutes - wake_minutes) <= window_min
 
 # 대기 함수
+# def wait_until_start(start_datetime : datetime.datetime)
 def wait_until_start(start_datetime):
-    print(f"brainalarm 시작 예정 시각: {start_datetime.strftime('%H:%M:%S')}")
-    print(datetime.datetime.now().strftime('%H:%M:%S'))
+    UTC9_start_datetime = datetime.datetime.fromtimestamp(start_datetime.timestamp()+TIMEGAP)
+    # 표기는 사용자 설정 시각인 UTC+9으로
+    print(f"brainalarm 시작 예정 시각: {UTC9_start_datetime.strftime('%H:%M:%S')}")
+    print(datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S'))
     while datetime.datetime.now() < (start_datetime):
         time.sleep(30)
 
 # 메인 함수
+# smart_alarm_loop(
+#     sleep_stage_model: object,            # scikit-learn 모델 같은 ML 모델 객체
+#     start_time: datetime.datetime,        # 기상 탐색 시작 시각
+#     wake_time: datetime.time,             # 목표 기상 시각
+#     wake_window_min: int,                 # 기상 윈도우(분 단위)
+#     args: argparse.Namespace              # CLI 인자 모음
+# )
 def smart_alarm_loop(model, start_time, wake_time, wake_window_min, args):
     alarm_triggered = False
 

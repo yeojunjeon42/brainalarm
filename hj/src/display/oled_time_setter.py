@@ -17,9 +17,6 @@ import busio
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
 
-TIMEGAP = 60*60*9 #UTC+9 (Seoul)
-
-# All time variables follow """UTC"""
 # Global variables for smart alarm integration
 settime = time.time()  # Unix timestamp of set wake time
 wake_window_minutes = 30  # Wake window in minutes (0-90)
@@ -292,15 +289,10 @@ class OLEDTimeSetter:
         
         # Update global variables for smart alarm integration
         today = datetime.date.today()
-        set_datetime = datetime.datetime.combine(today, datetime.time(self.set_hour, self.set_minute))
-        #UTC+9->UTC
-        set_datetime = set_datetime - datetime.timedelta(hours = 9)
-        settime = set_datetime.timestamp()
-        #입력 당시부터 settime의 날짜 변경
-        if settime <= time.time(): #이미 설정 시간을 지남
-            set_datetime = set_datetime + datetime.timedelta(days = 1)
-            settime = set_datetime.timestamp()
 
+        #set_datetime이 기존에 당일 몇 시에 대해서만 설정 가능
+        set_datetime = datetime.datetime.combine(today, datetime.time(self.set_hour, self.set_minute))
+        settime = set_datetime.timestamp()
         self.set_time_fixed = True
         
         # Stop blinking since time is now set
