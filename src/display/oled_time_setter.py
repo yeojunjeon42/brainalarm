@@ -22,7 +22,6 @@ TIMEGAP = 60*60*9 #UTC+9 (Seoul)
 # All time variables follow """UTC"""
 # Global variables for smart alarm integration
 settime = time.time()  # Unix timestamp of set wake time
-wake_window_minutes = 30  # Wake window in minutes (0-90)
 wake_window_fixed = False  # Whether the wake window has been set
 
 
@@ -267,8 +266,7 @@ class OLEDTimeSetter:
     def confirm_window(self):
         """Confirm wake window and move to time setting"""
         global wake_window_minutes, wake_window_fixed
-        
-        wake_window_minutes = self.wake_window
+
         wake_window_fixed = True
         self.interface_mode = 'TIME'
         self.time_is_blinking = True  # Start blinking when entering time mode
