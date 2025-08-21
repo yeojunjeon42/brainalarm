@@ -47,12 +47,14 @@ def smart_alarm_loop(model, start_time, wake_time, wake_window_min, args):
 
     # 2. smart alarm 작동
     while not alarm_triggered:
-        print('ddddd')
         now = datetime.datetime.now().time()
 
         if is_within_wake_window(now, wake_time, wake_window_min):
+            if eeg_reader.feature is None:
+                print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] EEG 데이터가 없습니다. 30초 후 다시 시도합니다.")
             #now 이전 30초의 EEG 데이터에서 scaled features 추출
-            predicted_stage = model.predict(eeg_reader.feature)
+            else:
+                predicted_stage = model.predict(eeg_reader.feature)
 
             #N2면 1/ 아니면 0
             if predicted_stage == 1:
