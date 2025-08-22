@@ -17,6 +17,7 @@ import serial
 import time
 import sys
 from enum import Enum
+import threading
 from collections import deque
 from typing import Optional, Callable, Any
 from src.processing.feature_extract import exfeature
@@ -235,6 +236,7 @@ class EEGReader:
         self.running = False
         self.feature_extractor = EpochFeatureExtractor(fs=512, epoch_duration=30)
         self.feature = None
+        self.thread: Optional[threading.Thread] = None
         
     def connect(self) -> bool:
         """
@@ -291,6 +293,8 @@ class EEGReader:
                 raw_val = (value[0] << 8) | value[1]
             else:
                 raw_val = value
+            if raw_val > 32768:
+                raw_val -= 65536
             print(f"[{timestamp}] Raw Signal: {raw_val}")
             self.feature = self.feature_extractor.add_sample(raw_val)
             
@@ -299,72 +303,37 @@ class EEGReader:
             value_hex = ' '.join([f'{b:02X}' for b in value]) if isinstance(value, (bytes, bytearray)) else f'{value:02X}'
             print(f"[{timestamp}] Code 0x{code:02X} (Level {extended_code_level}): {value_hex}")
 
-    def display_raw_hex(self, buffer_size: int = 32):
+    def start(self, mode: str = 'parsed'):
         """
-        Display raw hex data from serial stream
+        EEG 모니터링을 별도의 스레드에서 시작합니다.
         
         Args:
-            buffer_size: Number of bytes to read at once
+            mode (str): 'parsed' (해석된 데이터만 출력) 또는 'raw_hex' (HEX와 함께 출력)
         """
+        if self.running:
+            print("Monitoring is already running.")
+            return
+
         if not self.serial_conn or not self.serial_conn.is_open:
-            print("Serial connection not established")
+            print("Serial connection not established.")
+            return
+
+        # 1. mode 값에 따라 스레드가 실행할 타겟 함수를 선택합니다.
+        if mode == 'parsed':
+            target_loop = self._monitor_loop
+        elif mode == 'raw_hex':
+            target_loop = self._display_hex_loop
+        else:
+            print(f"Invalid mode '{mode}'. Choose 'parsed' or 'raw_hex'.")
             return
             
-        print(f"Displaying raw hex data from {self.port}")
-        print("Press Ctrl+C to stop\n")
-        
         self.running = True
-        byte_count = 0
-        
-        try:
-            while self.running:
-                if self.serial_conn.in_waiting > 0:
-                    # Read available bytes
-                    data = self.serial_conn.read(min(buffer_size, self.serial_conn.in_waiting))
-                    
-                    if data:
-                        timestamp = time.strftime("%H:%M:%S.%f")[:-3]
-                        hex_data = ' '.join([f'{b:02X}' for b in data])
-                        
-                        # Display raw hex
-                        print(f"[{timestamp}] RAW HEX: {hex_data}")
-                        
-                        # Parse each byte through ThinkGear parser
-                        for byte_val in data:
-                            result = self.parser.parse_byte(byte_val)
-                            if result == 1:
-                                print(f"[{timestamp}] ✓ Packet parsed successfully")
-                            elif result < 0:
-                                error_msg = {
-                                    -1: "Invalid parser",
-                                    -2: "Checksum failed", 
-                                    -3: "Payload too long",
-                                    -4: "Standby mode",
-                                    -5: "Unrecognized state"
-                                }.get(result, f"Unknown error {result}")
-                                print(f"[{timestamp}] ✗ Parser error: {error_msg}")
-                        
-                        byte_count += len(data)
-                        print(f"Total bytes received: {byte_count}\n")
-                        
-                else:
-                    time.sleep(0.01)  # Small delay to prevent busy waiting
-                    
-        except KeyboardInterrupt:
-            print("\nStopping hex display...")
-            self.running = False
-    
-    def start_monitoring(self):
-        """Start monitoring EEG data with parsed output"""
-        if not self.serial_conn or not self.serial_conn.is_open:
-            print("Serial connection not established")
-            return
-            
-        print(f"Starting EEG monitoring on {self.port}")
-        print("Press Ctrl+C to stop\n")
-        
-        self.running = True
-        
+        self.thread = threading.Thread(target=target_loop, daemon=True)
+        self.thread.start()
+        print(f"EEG monitoring thread started in '{mode}' mode on {self.port}")
+
+    def _monitor_loop(self):
+        """(스레드에서 실행됨) 해석된 데이터만 출력하는 루프"""
         try:
             while self.running:
                 if self.serial_conn.in_waiting > 0:
@@ -372,10 +341,47 @@ class EEGReader:
                     self.parser.parse_byte(byte_val)
                 else:
                     time.sleep(0.001)
-                    
-        except KeyboardInterrupt:
-            print("\nStopping EEG monitoring...")
+        except Exception as e:
+            print(f"An error occurred in the monitoring thread: {e}")
             self.running = False
+
+    def _display_hex_loop(self):
+        """(스레드에서 실행됨) Raw Hex와 해석된 데이터를 함께 출력하는 루프"""
+        # 2. display_raw_hex 메서드의 루프 로직을 가져왔습니다.
+        try:
+            while self.running:
+                if self.serial_conn.in_waiting > 0:
+                    data = self.serial_conn.read(self.serial_conn.in_waiting)
+                    
+                    if data:
+                        timestamp = time.strftime("%H:%M:%S.%f")[:-3]
+                        hex_data = ' '.join([f'{b:02X}' for b in data])
+                        
+                        # Raw Hex 출력
+                        print(f"[{timestamp}] RAW HEX: {hex_data}")
+                        
+                        # 각 바이트를 파서로 전달
+                        for byte_val in data:
+                            self.parser.parse_byte(byte_val)
+                else:
+                    time.sleep(0.01)
+        except Exception as e:
+            print(f"An error occurred in the hex display thread: {e}")
+            self.running = False
+
+    def stop(self):
+        """EEG 모니터링 스레드를 중지합니다."""
+        if not self.running:
+            print("Monitoring is not running.")
+            return
+        
+        print("\nStopping EEG monitoring thread...")
+        self.running = False
+        
+        if self.thread:
+            self.thread.join()
+            
+        print("EEG monitoring thread stopped.")
 
 
 def main():
@@ -401,9 +407,9 @@ def main():
     
     try:
         if args.mode == 'hex':
-            eeg_reader.display_raw_hex()
+            eeg_reader.start('raw_hex')
         else:
-            eeg_reader.start_monitoring()
+            eeg_reader.start('parsed')
     finally:
         eeg_reader.disconnect()
 

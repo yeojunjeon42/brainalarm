@@ -3,7 +3,7 @@ import time
 import pandas as pd
 import joblib
 from src.display.oled_time_setter import OLEDTimeSetter
-from src.alarm.smart_alarm import smart_alarm_loop
+from src.alarm.smart_alarm import SmartAlarm
 import argparse
 from src.hardware.eeg import EEGReader
 import os
@@ -45,8 +45,6 @@ if system.set_time_fixed:
     
     args = parser.parse_args()
     
-    # Create EEG reader
-    eeg_reader = EEGReader(port=args.port, baudrate=args.baudrate)
 
     # 모델 로드
     sleep_stage_model = joblib.load(MODEL_PATH)
@@ -54,4 +52,13 @@ if system.set_time_fixed:
 
 
     # 실행--> UTC + 9기준으로 입력됨
-    smart_alarm_loop(sleep_stage_model, start_time, wake_time, wake_window_min, args)
+    alarm_system = SmartAlarm(sleep_stage_model, start_time, wake_time, wake_window_min, args)
+
+    try:
+        alarm_system.start()
+        alarm_system.join()
+    except KeyboardInterrupt:
+        print("\n사용자에 의해 프로그램이 중단되었습니다.")
+    finally:
+        alarm_system.stop()
+        print("프로그램을 종료합니다.")
