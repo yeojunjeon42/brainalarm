@@ -31,7 +31,7 @@ def get_set_time_info():
     
     Returns:
         dict: Contains settime (unix timestamp), settime_fixed (bool), 
-              and formatted time info
+              wake_window_minutes, and formatted time info
     """
     if settime_fixed:
         set_dt = datetime.datetime.fromtimestamp(settime)
@@ -40,7 +40,9 @@ def get_set_time_info():
             'settime_fixed': settime_fixed,
             'hour': set_dt.hour,
             'minute': set_dt.minute,
-            'formatted': set_dt.strftime('%I:%M %p')
+            'formatted': set_dt.strftime('%I:%M %p'),
+            'wake_window_minutes': wake_window_minutes,
+            'wake_window_fixed': wake_window_fixed
         }
     else:
         return {
@@ -48,7 +50,9 @@ def get_set_time_info():
             'settime_fixed': False,
             'hour': None,
             'minute': None,
-            'formatted': 'Not Set'
+            'formatted': 'Not Set',
+            'wake_window_minutes': wake_window_minutes if wake_window_fixed else None,
+            'wake_window_fixed': wake_window_fixed
         }
 
 def is_time_set():
@@ -87,7 +91,7 @@ class OLEDTimeSetter:
         self.set_is_pm = True
         
         # Interface state management
-        self.interface_mode = 'WINDOW'  # WINDOW, TIME
+        self.interface_mode = 'WINDOW'  # WINDOW, TIME, CLOCK
         self.time_is_blinking = True
         self.last_blink_time = time.time()
         self.blink_state = True
@@ -137,6 +141,8 @@ class OLEDTimeSetter:
             self.draw_window_interface()
         elif self.interface_mode == 'TIME':
             self.draw_time_interface()
+        elif self.interface_mode == 'CLOCK':
+            self.draw_clock_interface()
         
         # Update display
         self.oled.image(self.image)
@@ -174,38 +180,43 @@ class OLEDTimeSetter:
     
     def draw_time_interface(self):
         """Draw the time setting interface with blinking"""
-        # Check if we should blink
+        # Check if we should blink with 1s on, 0.5s off pattern
         current_time = time.time()
-        if current_time - self.last_blink_time >= 1.0:  # 1 second intervals
-            self.blink_state = not self.blink_state
-            self.last_blink_time = current_time
+        if self.blink_state:  # Currently showing
+            if current_time - self.last_blink_time >= 1.0:  # Show for 1 second
+                self.blink_state = False
+                self.last_blink_time = current_time
+        else:  # Currently hidden
+            if current_time - self.last_blink_time >= 0.5:  # Hide for 0.5 seconds
+                self.blink_state = True
+                self.last_blink_time = current_time
         
         # Only draw time if not blinking or if blink state is True
         if not self.time_is_blinking or self.blink_state:
-        # Format time as HH:MM AM/PM
+            # Format time as HH:MM AM/PM
             display_hour = self.set_hour
             if display_hour == 0:
                 display_hour = 12
             elif display_hour > 12:
                 display_hour = display_hour - 12
         
-        time_text = "{:02d}:{:02d}".format(display_hour, self.set_minute)
-        ampm_text = "PM" if self.set_is_pm else "AM"
-        
-        # Center the time text
-        bbox = self.draw.textbbox((0, 0), time_text, font=self.time_font)
-        time_width = bbox[2] - bbox[0]
-        time_x = (128 - time_width) // 2
-        time_y = 18  # Slightly higher for better centering
-        
-        # Draw time
-        self.draw.text((time_x, time_y), time_text, font=self.time_font, fill=255)
-        
-        # Draw AM/PM below time
-        ampm_bbox = self.draw.textbbox((0, 0), ampm_text, font=self.ampm_font)
-        ampm_width = ampm_bbox[2] - ampm_bbox[0]
-        ampm_x = (128 - ampm_width) // 2
-        self.draw.text((ampm_x, time_y + 25), ampm_text, font=self.ampm_font, fill=255)
+            time_text = "{:02d}:{:02d}".format(display_hour, self.set_minute)
+            ampm_text = "PM" if self.set_is_pm else "AM"
+            
+            # Center the time text
+            bbox = self.draw.textbbox((0, 0), time_text, font=self.time_font)
+            time_width = bbox[2] - bbox[0]
+            time_x = (128 - time_width) // 2
+            time_y = 18  # Slightly higher for better centering
+            
+            # Draw time
+            self.draw.text((time_x, time_y), time_text, font=self.time_font, fill=255)
+            
+            # Draw AM/PM below time
+            ampm_bbox = self.draw.textbbox((0, 0), ampm_text, font=self.ampm_font)
+            ampm_width = ampm_bbox[2] - ampm_bbox[0]
+            ampm_x = (128 - ampm_width) // 2
+            self.draw.text((ampm_x, time_y + 25), ampm_text, font=self.ampm_font, fill=255)
         
         # Show window info at bottom
         window_info = "{}min before".format(self.wake_window)
@@ -213,6 +224,68 @@ class OLEDTimeSetter:
         window_width = window_bbox[2] - window_bbox[0]
         window_x = (128 - window_width) // 2
         self.draw.text((window_x, 54), window_info, font=self.ampm_font, fill=255)
+    
+    def draw_clock_interface(self):
+        """Draw the clock interface showing current time and alarm time"""
+        # Get current time
+        now = datetime.datetime.now()
+        current_hour = now.hour
+        current_minute = now.minute
+        
+        # Format current time for display
+        if current_hour == 0:
+            display_current_hour = 12
+        elif current_hour > 12:
+            display_current_hour = current_hour - 12
+        else:
+            display_current_hour = current_hour
+        
+        current_ampm = "PM" if current_hour >= 12 else "AM"
+        
+        # Display current time as main time (large font)
+        current_time_text = "{:02d}:{:02d}".format(display_current_hour, current_minute)
+        bbox = self.draw.textbbox((0, 0), current_time_text, font=self.time_font)
+        time_width = bbox[2] - bbox[0]
+        time_x = (128 - time_width) // 2
+        time_y = 18
+        
+        # Draw current time
+        self.draw.text((time_x, time_y), current_time_text, font=self.time_font, fill=255)
+        
+        # Draw current AM/PM
+        ampm_bbox = self.draw.textbbox((0, 0), current_ampm, font=self.ampm_font)
+        ampm_width = ampm_bbox[2] - ampm_bbox[0]
+        ampm_x = (128 - ampm_width) // 2
+        self.draw.text((ampm_x, time_y + 25), current_ampm, font=self.ampm_font, fill=255)
+        
+        # Display alarm time in bottom right corner (smaller font)
+        if settime_fixed:
+            alarm_dt = datetime.datetime.fromtimestamp(settime)
+            alarm_hour = alarm_dt.hour
+            alarm_minute = alarm_dt.minute
+            
+            if alarm_hour == 0:
+                display_alarm_hour = 12
+            elif alarm_hour > 12:
+                display_alarm_hour = alarm_hour - 12
+            else:
+                display_alarm_hour = alarm_hour
+            
+            alarm_ampm = "PM" if alarm_hour >= 12 else "AM"
+            
+            alarm_text = "{:02d}:{:02d}".format(display_alarm_hour, alarm_minute)
+            alarm_bbox = self.draw.textbbox((0, 0), alarm_text, font=self.ampm_font)
+            alarm_width = alarm_bbox[2] - alarm_bbox[0]
+            
+            # Position in bottom right corner
+            alarm_x = 128 - alarm_width - 2  # 2 pixels from right edge
+            alarm_y = 54  # Bottom of screen
+            
+            # Draw alarm time
+            self.draw.text((alarm_x, alarm_y), alarm_text, font=self.ampm_font, fill=255)
+            
+            # Draw small alarm indicator
+            self.draw.text((alarm_x - 8, alarm_y), "⏰", font=self.ampm_font, fill=255)
     
     def adjust_window(self, increment):
         """Adjust wake window by increment (in 5-minute steps)"""
@@ -299,8 +372,12 @@ class OLEDTimeSetter:
         # Stop blinking since time is now set
         self.time_is_blinking = False
         
+        # Switch to clock interface to show current time
+        self.interface_mode = 'CLOCK'
+        
         print("✅ Smart alarm fully configured!")
         print("✅ Monitoring will start {} minutes before wake time".format(self.wake_window))
+        print("📱 Display switched to clock mode - showing current time")
 
     def handle_gpio(self):
         """Handle GPIO inputs in separate thread"""
@@ -319,6 +396,11 @@ class OLEDTimeSetter:
                         self.confirm_window()
                     elif self.interface_mode == 'TIME':
                         self.confirm_time()
+                    elif self.interface_mode == 'CLOCK':
+                        # In clock mode, set button can be used to return to time setting
+                        print("🔄 Returning to time setting mode...")
+                        self.interface_mode = 'TIME'
+                        self.time_is_blinking = False  # Don't blink when returning
                 self.last_set_state = set_state
                 
                 # Handle rotary encoder
@@ -362,11 +444,12 @@ class OLEDTimeSetter:
             print("\nOLED Time Setter running...")
             print("Interface Flow:")
             print("1. Set wake window (0-90 minutes)")
-            print("2. Set wake time")
+            print("2. Set wake time (with blinking)")
+            print("3. Clock mode (current time + alarm in corner)")
             print("Controls:")
             print("- Reset button (pin 4): Reset to window selection")
             print("- Rotary encoder: Adjust window/time") 
-            print("- Set button (pin 23): Confirm window then time")
+            print("- Set button (pin 23): Confirm window/time, return to time setting")
             print("Press Ctrl+C to stop")
             print("=" * 50)
             
