@@ -45,8 +45,6 @@ if system.set_time_fixed:
     
     args = parser.parse_args()
     
-    # Create EEG reader
-    eeg_reader = EEGReader(port=args.port, baudrate=args.baudrate)
 
     # 모델 로드
     sleep_stage_model = joblib.load(MODEL_PATH)
