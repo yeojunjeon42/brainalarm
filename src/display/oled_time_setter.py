@@ -22,6 +22,8 @@ TIMEGAP = 60*60*9 #UTC+9 (Seoul)
 # All time variables follow """UTC"""
 # Global variables for smart alarm integration
 settime = time.time()  # Unix timestamp of set wake time
+settime_fixed = False  # Whether the time has been confirmed/set
+wake_window_minutes = 30  # Wake window in minutes (0-90)
 wake_window_fixed = False  # Whether the wake window has been set
 
 
@@ -353,7 +355,7 @@ class OLEDTimeSetter:
     
     def confirm_time(self):
         """Confirm the wake time and finish setup"""
-        global settime
+        global settime, settime_fixed
         
         display_hour = self.set_hour
         if display_hour == 0:
@@ -376,7 +378,7 @@ class OLEDTimeSetter:
             set_datetime = set_datetime + datetime.timedelta(days = 1)
             settime = set_datetime.timestamp()
 
-        self.set_time_fixed = True
+        settime_fixed = True
         
         # Stop blinking since time is now set
         self.time_is_blinking = False
@@ -392,9 +394,8 @@ class OLEDTimeSetter:
         """Handle GPIO inputs in separate thread"""
         while self.running:
             try:
-                if self.set_time_fixed:
-                    time.sleep(0.1)
-                    continue  # Skip GPIO handling if time is already set
+                # Don't skip GPIO handling - we need to keep the display updated
+                # and handle button presses even when time is set
                 # Handle reset button (pin 4)
                 reset_state = GPIO.input(self.reset_pin)
                 if self.last_reset_state == 1 and reset_state == 0:  # Button pressed (falling edge)
@@ -471,13 +472,6 @@ class OLEDTimeSetter:
             # Main display update loop
             while self.running:
                 self.update_display()
-                if self.set_time_fixed:
-                    # 시간이 설정되었다면, 3초간 최종 시간을 보여주고 종료
-                    time.sleep(3)
-                    self.running = False # 루프 종료 신호
-                else:
-                    # 시간이 설정되지 않았다면, 0.1초 대기
-                    time.sleep(0.1)
                 time.sleep(0.1)  # Update display 10 times per second
                 
         except KeyboardInterrupt:
