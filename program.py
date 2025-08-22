@@ -13,7 +13,7 @@ MODEL_PATH = os.path.join(BASE_DIR, 'models/final_model.joblib')
 
 
 system = OLEDTimeSetter()
-system.run()
+# system.run()
 
 # 사용자 설정
 if system.set_time_fixed:
