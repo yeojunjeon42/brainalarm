@@ -22,6 +22,8 @@ TIMEGAP = 60*60*9 #UTC+9 (Seoul)
 # All time variables follow """UTC"""
 # Global variables for smart alarm integration
 settime = time.time()  # Unix timestamp of set wake time
+settime_fixed = False
+wake_window_minutes = 30
 wake_window_fixed = False  # Whether the wake window has been set
 
 

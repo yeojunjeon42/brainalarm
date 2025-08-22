@@ -7,6 +7,11 @@ import argparse
 import sys
 import os
 from pytz import timezone
+import RPi.GPIO as GPIO
+import board
+import busio
+from PIL import Image, ImageDraw, ImageFont
+import adafruit_ssd1306
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'processing'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'hardware'))
@@ -14,7 +19,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'display'))
 
 #All time variables use UTC (python3)
 TIMEGAP = 60*60*9
-
 
 # 알람 작동
 def trigger_alarm():
