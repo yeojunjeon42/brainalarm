@@ -233,7 +233,7 @@ class OLEDTimeSetter:
     def draw_clock_interface(self):
         """Draw the clock interface showing current time and alarm time"""
         # Get current time
-        now = datetime.datetime.now()
+        now = datetime.datetime.now()+ datetime.timedelta(hours = 9)
         current_hour = now.hour
         current_minute = now.minute
         
