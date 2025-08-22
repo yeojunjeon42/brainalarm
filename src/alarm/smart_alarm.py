@@ -8,6 +8,11 @@ import os
 import threading
 from typing import Optional
 from pytz import timezone
+import RPi.GPIO as GPIO
+import board
+import busio
+from PIL import Image, ImageDraw, ImageFont
+import adafruit_ssd1306
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'processing'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'hardware'))
@@ -15,7 +20,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'display'))
 
 #All time variables use UTC (python3)
 TIMEGAP = 60*60*9
-
 
 # 알람 작동
 def trigger_alarm():
@@ -39,13 +43,14 @@ def is_within_wake_window(current_time, wake_time, window_min=15):
     # return abs(current_minutes - wake_minutes) <= window_min
 
 # 대기 함수
-# def wait_until_start(start_datetime : datetime.datetime)
+# def wait_until_start(start_datetime : datetime.datetime, UTC+9로 입력됨)
 def wait_until_start(start_datetime):
     UTC9_start_datetime = datetime.datetime.fromtimestamp(start_datetime.timestamp()+TIMEGAP)
     # 표기는 사용자 설정 시각인 UTC+9으로
-    print(f"brainalarm 시작 예정 시각: {UTC9_start_datetime.strftime('%H:%M:%S')}")
+    print(f"brainalarm 시작 예정 시각: {start_datetime.strftime('%H:%M:%S')}")
+    print("현재시각:", end = ' ')
     print(datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S'))
-    while datetime.datetime.now() < (start_datetime):
+    while time.time() < start_datetime.timestamp() -TIMEGAP:
         time.sleep(30)
 
 # 메인 함수

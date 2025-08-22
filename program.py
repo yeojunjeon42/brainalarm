@@ -53,5 +53,5 @@ if system.set_time_fixed:
 
 
 
-    # 실행
+    # 실행--> UTC + 9기준으로 입력됨
     smart_alarm_loop(sleep_stage_model, start_time, wake_time, wake_window_min, args)
