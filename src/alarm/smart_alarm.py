@@ -100,7 +100,7 @@ class SmartAlarm:
 
         while self.running:
             loop_start_time = time.monotonic()
-            now_time = time.time()
+            now_time = time.time() #지금 한국 시간으로 바꿔야 함##############################################
 
             # 4. 기상 윈도우에 진입했는지 확인
             if is_within_wake_window(now_time, self.wake_time, self.wake_window_min):
@@ -141,7 +141,6 @@ class SmartAlarm:
                 print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 목표 기상 시간 도달! 알람을 울립니다.")
                 trigger_alarm()
                 self.running = False # 알람 울렸으므로 종료
-                continue
 
             elapsed_time = time.monotonic() - loop_start_time
             sleep_duration = 30 - elapsed_time
