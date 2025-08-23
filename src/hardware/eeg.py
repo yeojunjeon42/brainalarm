@@ -209,21 +209,23 @@ class EpochFeatureExtractor:
         self.epoch_duration = epoch_duration
         self.buffer_size = fs * epoch_duration
         self.buffer = deque(maxlen=self.buffer_size)  # raw EEG data 저장
+        self.features = None  # 마지막으로 추출된 특징 벡터 저장
         
     def add_sample(self, sample):
         """새로운 raw EEG 샘플 추가"""
         self.buffer.append(sample)
+        has_thirty_seconds_data = None
         
         # 버퍼가 가득 차면 특징 추출
         if len(self.buffer) == self.buffer_size:
+            has_thirty_seconds_data = True
             data = np.array(self.buffer, dtype=np.float32)
-            features = exfeature(data, fs=self.fs)
+            self.features = exfeature(data, fs=self.fs)
             
             # 버퍼 초기화 (슬라이딩 윈도우 원한다면 주석 처리)
             self.buffer.clear()
             
-            return features
-        return None
+        return (self.features, has_thirty_seconds_data)
 
 class EEGReader:
     """EEG Data Reader with hex display functionality"""
@@ -237,6 +239,9 @@ class EEGReader:
         self.feature_extractor = EpochFeatureExtractor(fs=512, epoch_duration=30)
         self.feature = None
         self.thread: Optional[threading.Thread] = None
+        self.signal_quality = 0
+        self.noise_threshold = 50  # 신호 품질 임계값 (예: 50 이상은 노이즈 많음)
+        self.new_feature_ready = False
         
     def connect(self) -> bool:
         """
@@ -274,6 +279,7 @@ class EEGReader:
         if code == CODE_POOR_SIGNAL:
             signal_quality = 100 - value[0] if isinstance(value, (bytes, bytearray)) else 100 - value
             print(f"[{timestamp}] Signal Quality: {signal_quality}%")
+            self.signal_quality = signal_quality
             
         elif code == CODE_ATTENTION:
             attention = value[0] if isinstance(value, (bytes, bytearray)) else value
@@ -296,7 +302,11 @@ class EEGReader:
             if raw_val > 32768:
                 raw_val -= 65536
             print(f"[{timestamp}] Raw Signal: {raw_val}")
-            self.feature = self.feature_extractor.add_sample(raw_val)
+            new_feature, is_ready = self.feature_extractor.add_sample(raw_val)
+            if is_ready:
+                self.feature = new_feature
+                self.new_feature_ready = True
+                print(f"[{timestamp}] New 30s epoch feature extracted.")
             
             
         else:

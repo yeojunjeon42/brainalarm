@@ -8,11 +8,6 @@ import os
 import threading
 from typing import Optional
 from pytz import timezone
-import RPi.GPIO as GPIO
-import board
-import busio
-from PIL import Image, ImageDraw, ImageFont
-import adafruit_ssd1306
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'processing'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'hardware'))
@@ -38,9 +33,6 @@ def is_within_wake_window(current_time, wake_time, window_min=15):
     if current_time_timestamp <= wake_time_timestamp and current_time_timestamp >= wake_time_timestamp + window_min*60:
         return True
     return False
-    # current_minutes = current_time.hour * 60 + current_time.minute
-    # wake_minutes = wake_time.hour * 60 + wake_time.minute
-    # return abs(current_minutes - wake_minutes) <= window_min
 
 # 대기 함수
 # def wait_until_start(start_datetime : datetime.datetime, UTC+9로 입력됨)
@@ -53,49 +45,6 @@ def wait_until_start(start_datetime):
     while time.time() < start_datetime.timestamp() -TIMEGAP:
         time.sleep(30)
 
-# 메인 함수
-# smart_alarm_loop(
-#     sleep_stage_model: object,            # scikit-learn 모델 같은 ML 모델 객체
-#     start_time: datetime.datetime,        # 기상 탐색 시작 시각
-#     wake_time: datetime.time,             # 목표 기상 시각
-#     wake_window_min: int,                 # 기상 윈도우(분 단위)
-#     args: argparse.Namespace              # CLI 인자 모음
-# )
-# def smart_alarm_loop(model, start_time, wake_time, wake_window_min, args):
-#     alarm_triggered = False
-
-#     # 1. 설정된 시간까지 대기
-#     wait_until_start(start_time)
-    
-#     # Create EEG reader
-#     eeg_reader = EEGReader(port=args.port, baudrate=args.baudrate)
-#     if not eeg_reader.connect():
-#         sys.exit(1)
-
-#     # 2. smart alarm 작동
-#     while not alarm_triggered:
-#         now = datetime.datetime.now().time()
-
-#         if is_within_wake_window(now, wake_time, wake_window_min):
-#             if eeg_reader.feature is None:
-#                 print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] EEG 데이터가 없습니다. 30초 후 다시 시도합니다.")
-#                 predicted_stage = 0
-#             #now 이전 30초의 EEG 데이터에서 scaled features 추출
-#             else:
-#                 predicted_stage = model.predict(eeg_reader.feature)
-
-#             #N2면 1/ 아니면 0
-#             if predicted_stage == 1:
-#                 trigger_alarm()
-#                 alarm_triggered = True
-#         if now >= wake_time:
-#             trigger_alarm()
-#             alarm_triggered = True
-#             eeg_reader.disconnect()
-#             print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 기상 윈도우 종료됨.")
-#             break
-
-#         time.sleep(30)  # 30초 간격으로 체크
 class SmartAlarm:
     def __init__(self, model, start_time, wake_time, wake_window_min, args):
         self.model = model
@@ -150,7 +99,8 @@ class SmartAlarm:
         eeg_started = False # EEG 리더가 시작되었는지 확인하는 플래그
 
         while self.running:
-            now_time = datetime.datetime.now().time()
+            loop_start_time = time.monotonic()
+            now_time = time.time()
 
             # 4. 기상 윈도우에 진입했는지 확인
             if is_within_wake_window(now_time, self.wake_time, self.wake_window_min):
@@ -168,18 +118,23 @@ class SmartAlarm:
 
                 # 6. EEG 리더가 성공적으로 시작된 후에만 아래 로직을 수행합니다.
                 if eeg_started:
-                    feature = self.eeg_reader.feature
-                    if feature is None:
-                        print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] EEG 특징 데이터 수집 중... (30초 소요)")
-                    else:
-                        predicted_stage = self.model.predict(feature.reshape(1, -1))[0]
-                        print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 현재 수면 단계 예측: {predicted_stage}")
+                    if self.eeg_reader.new_feature_ready:
+                        print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}]New EEG feature available for prediction.")
+                        if self.eeg_reader.signal_quality > self.eeg_reader.noise_threshold:
+                            print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 신호 품질이 좋지 않습니다 ({self.eeg_reader.signal_quality}%). 다시 시도합니다.")
+                        else:
+                            feature_vector = self.eeg_reader.feature
+                            feature = feature_vector.reshape(1, -1)
+                            predicted_stage = self.model.predict(feature)[0]
+                            print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 현재 수면 단계 예측: {predicted_stage}")
 
-                        if predicted_stage == 1: # 얕은 수면으로 가정
-                            print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 얕은 수면 감지! 알람을 울립니다.")
-                            trigger_alarm()
-                            self.running = False # 알람 울렸으므로 종료
-                            continue
+                            if predicted_stage == 1: # 얕은 수면으로 가정
+                                print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 얕은 수면 감지! 알람을 울립니다.")
+                                trigger_alarm()
+                                self.running = False # 알람 울렸으므로 종료
+                        self.eeg_reader.new_feature_ready = False
+                    else:
+                        print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 새로운 EEG 특징이 아직 준비되지 않았습니다. 기다립니다...")
 
             # 목표 기상 시간이 되면 무조건 알람 울림
             if now_time >= self.wake_time:
@@ -187,8 +142,10 @@ class SmartAlarm:
                 trigger_alarm()
                 self.running = False # 알람 울렸으므로 종료
                 continue
-            
-            # 30초 간격으로 체크
-            time.sleep(30)
+
+            elapsed_time = time.monotonic() - loop_start_time
+            sleep_duration = 30 - elapsed_time
+            if sleep_duration > 0:
+                time.sleep(sleep_duration)
         
         print("Alarm loop finished.")

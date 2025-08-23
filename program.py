@@ -5,7 +5,6 @@ import joblib
 from src.display.oled_time_setter import OLEDTimeSetter
 from src.alarm.smart_alarm import SmartAlarm
 import argparse
-from src.hardware.eeg import EEGReader
 import os
 import sys
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
