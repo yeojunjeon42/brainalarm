@@ -188,11 +188,11 @@ class OLEDTimeSetter:
         # Check if we should blink with 1s on, 0.5s off pattern
         current_time = time.time()
         if self.blink_state:  # Currently showing
-            if current_time - self.last_blink_time >= 1.0:  # Show for 1 second
+            if current_time - self.last_blink_time >= 1.9:  # Show for 1.9 second
                 self.blink_state = False
                 self.last_blink_time = current_time
         else:  # Currently hidden
-            if current_time - self.last_blink_time >= 0.5:  # Hide for 0.5 seconds
+            if current_time - self.last_blink_time >= 0.1:  # Hide for 0.1 seconds
                 self.blink_state = True
                 self.last_blink_time = current_time
         
@@ -264,7 +264,7 @@ class OLEDTimeSetter:
         self.draw.text((ampm_x, time_y + 25), current_ampm, font=self.ampm_font, fill=255)
         
         # Display alarm time in bottom right corner (smaller font)
-        if settime_fixed:
+        if self.set_time_fixed:
             alarm_dt = datetime.datetime.fromtimestamp(settime + TIMEGAP)
             alarm_hour = alarm_dt.hour
             alarm_minute = alarm_dt.minute

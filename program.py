@@ -2,7 +2,7 @@ import datetime
 import time
 import pandas as pd
 import joblib
-from src.display.oled_time_setter import OLEDTimeSetter
+from src.display.oled_time_setter2 import OLEDTimeSetter
 from src.alarm.smart_alarm import SmartAlarm
 import argparse
 import os
@@ -12,7 +12,7 @@ MODEL_PATH = os.path.join(BASE_DIR, 'models/final_model.joblib')
 
 
 system = OLEDTimeSetter()
-# system.run()
+system.run()
 
 # 사용자 설정
 if system.set_time_fixed:
@@ -30,7 +30,7 @@ if system.set_time_fixed:
     # ✅ 3. 변환된 24시간제 시간으로 datetime.time 객체 생성
     # 튜플이 아닌, 각 값을 인자로 전달합니다.
     wake_time = datetime.time(h_24, m)  # 기상 목표 시각
-    wake_window_min = system.wake_window  # 예정 시각 +-30분에서 N2 수면 단계 감지 시 알람 작동
+    wake_window_min = system.wake_window  # 예정 시각 -wake_window_min만큼에서 N2 수면 단계 감지 시 알람 작동
     start_time = (datetime.datetime.combine(datetime.date.today(), wake_time)
               - datetime.timedelta(minutes=wake_window_min)) # 탐색 시작 시각
     
@@ -51,7 +51,7 @@ if system.set_time_fixed:
 
 
     # 실행--> UTC + 9기준으로 입력됨
-    alarm_system = SmartAlarm(sleep_stage_model, start_time, wake_time, wake_window_min, args)
+    alarm_system = SmartAlarm(sleep_stage_model, start_time, wake_time, wake_window_min, args, system)
 
     try:
         alarm_system.start()

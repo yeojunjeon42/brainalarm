@@ -46,12 +46,13 @@ def wait_until_start(start_datetime):
         time.sleep(30)
 
 class SmartAlarm:
-    def __init__(self, model, start_time, wake_time, wake_window_min, args):
+    def __init__(self, model, start_time, wake_time, wake_window_min, args, oled_system):
         self.model = model
         self.start_time = start_time
         self.wake_time = wake_time
         self.wake_window_min = wake_window_min
         self.args = args
+        self.oled_system = oled_system
 
         # 1. EEGReader 객체는 미리 생성해두지만, 연결은 하지 않습니다.
         self.eeg_reader = EEGReader(port=self.args.port, baudrate=self.args.baudrate)
@@ -104,7 +105,7 @@ class SmartAlarm:
 
             # 4. 기상 윈도우에 진입했는지 확인
             if is_within_wake_window(now_time, self.wake_time, self.wake_window_min):
-                
+                self.oled_system.running = False # OLED 시간 설정 모드 종료
                 # 5. EEG 리더가 아직 시작되지 않았다면, 여기서 시작합니다.
                 if not eeg_started:
                     print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 기상 윈도우 진입. EEG 데이터 수집을 시작합니다.")
