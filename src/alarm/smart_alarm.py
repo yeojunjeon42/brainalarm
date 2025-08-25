@@ -45,7 +45,6 @@ def is_within_wake_window(current_time, wake_time, window_min=15):
       print('alarm_time_adjusted')
     print('set alarm time:', alarm_time)
     wake_time_timestamp = alarm_time.timestamp()
-    print(wake_time_timestamp)
     if current_time_timestamp <= wake_time_timestamp and current_time_timestamp >= wake_time_timestamp + window_min*60:
         return True
     return False
