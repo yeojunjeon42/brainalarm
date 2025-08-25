@@ -302,14 +302,17 @@ class OLEDTimeSetter:
             print("Press Ctrl+C to stop")
             print("=" * 50)
             
-            while self.running:
+            while not self.set_time_fixed:
                 self.update_display()
                 time.sleep(0.1)
+            self.update_display()
+            time.sleep(2)
                 
         except KeyboardInterrupt:
             print("\nShutting down...")
         finally:
-            self.cleanup()
+            self.running = False
+            # self.cleanup()
     
     def cleanup(self):
         """Clean up resources"""

@@ -119,6 +119,7 @@ class SmartAlarm:
         while self.running:
             loop_start_time = time.monotonic()
             now_time = datetime.datetime.now() #지금 한국 시간으로 바꿔야 함-> 처리는 UTC, 출력만 UTC+9
+                
 
             # 4. 기상 윈도우에 진입했는지 확인
             if is_within_wake_window(now_time, self.wake_time, self.wake_window_min):
