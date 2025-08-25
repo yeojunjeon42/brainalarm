@@ -37,8 +37,8 @@ if system.set_time_fixed:
     # 튜플이 아닌, 각 값을 인자로 전달합니다.
     wake_time = datetime.time(h_24, m)  # 기상 목표 시각
     wake_window_min = system.wake_window_minutes  # 예정 시각 -wake_window_min만큼에서 N2 수면 단계 감지 시 알람 작동
-    start_time = (datetime.datetime.combine(datetime.date.today(), wake_time)
-              - datetime.timedelta(minutes=wake_window_min)) # 탐색 시작 시각
+    start_time = datetime.datetime.combine(datetime.date.today(), wake_time)
+            #   - datetime.timedelta(minutes=wake_window_min) # 탐색 시작 시각
     
     parser = argparse.ArgumentParser(description='EEG Data Reader for ThinkGear Protocol')
     parser.add_argument('--port', '-p', default='/dev/serial0', 
