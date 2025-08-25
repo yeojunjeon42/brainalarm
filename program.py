@@ -18,7 +18,6 @@ print(f'kaa{system.set_is_pm}')
 
 # 사용자 설정
 if system.set_time_fixed:
-    setfinishtime = datetime.datetime.now(timezone('Asia/Seoul')) 
     h_24 = system.set_hour
     m = system.set_minute
     is_pm = system.set_is_pm
@@ -29,9 +28,14 @@ if system.set_time_fixed:
 
     # ✅ 3. 변환된 24시간제 시간으로 datetime.time 객체 생성
     # 튜플이 아닌, 각 값을 인자로 전달합니다.
-    wake_time = datetime.time(h_24, m)
+    now = datetime.datetime.now(timezone('Asia/Seoul'))
+    wake_time_hm = datetime.time(h_24, m)
+    wake_time = datetime.datetime.combine(datetime.datetime.now(timezone('Asia/Seoul')).date(), wake_time_hm)
+    wake_time = timezone('Asia/Seoul').localize(wake_time)
+    if wake_time < now:
+        wake_time = wake_time + datetime.timedelta(days=1)
     wake_window_min = system.wake_window_minutes  # 예정 시각 -wake_window_min만큼에서 N2 수면 단계 감지 시 알람 작동
-    start_time = datetime.datetime.combine(datetime.datetime.now(timezone('Asia/Seoul')).date(), wake_time) -datetime.timedelta(minutes= wake_window_min)
+    start_time = wake_time -datetime.timedelta(minutes= wake_window_min)
     # datetime.datetime.combine(datetime.date.today(), wake_time)
             #   - datetime.timedelta(minutes=wake_window_min) # 탐색 시작 시각
     start_time = timezone('Asia/Seoul').localize(start_time)
@@ -52,7 +56,7 @@ if system.set_time_fixed:
 
 
     # 실행--> UTC + 9기준으로 입력됨
-    alarm_system = SmartAlarm(sleep_stage_model, start_time, wake_time, wake_window_min, args, setfinishtime)
+    alarm_system = SmartAlarm(sleep_stage_model, start_time, wake_time, wake_window_min, args)
 
     try:
         alarm_system.start()

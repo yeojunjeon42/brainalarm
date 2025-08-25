@@ -33,19 +33,13 @@ def trigger_alarm():
 #     if current_time_timestamp <= wake_time_timestamp and current_time_timestamp >= wake_time_timestamp + window_min*60:
 #         return True
 #     return False
-def is_within_wake_window(current_time, wake_time, window_min=15):
+def is_within_wake_window(current_time, start_time, window_min=15):
     print('is_within_wake_window --- running')
     current_time_timestamp = current_time.timestamp()
-    print(current_time_timestamp)
-    # alarm_time = datetime.datetime.combine(datetime.date.today(), wake_time)
-    alarm_time = datetime.datetime.combine(datetime.datetime.now(timezone('Asia/Seoul')).date(), wake_time)
-    alarm_time = timezone('Asia/Seoul').localize(alarm_time)
-    if alarm_time<current_time : 
-      alarm_time = alarm_time + datetime.timedelta(days = 1)
-      print('alarm_time_adjusted')
-    print('set alarm time:', alarm_time)
-    wake_time_timestamp = alarm_time.timestamp()
-    if current_time_timestamp <= wake_time_timestamp and current_time_timestamp >= wake_time_timestamp - window_min*60:
+    print('current time',current_time)
+    print('start time:', start_time)
+    start_time_timestamp = start_time.timestamp()
+    if current_time_timestamp >= start_time_timestamp and current_time_timestamp <= start_time_timestamp + window_min*60:
         return True
     return False
 
@@ -65,13 +59,12 @@ def wait_until_start(start_datetime):
         time.sleep(5)
 
 class SmartAlarm:
-    def __init__(self, model, start_time, wake_time, wake_window_min, args, setfinishtime):
+    def __init__(self, model, start_time, wake_time, wake_window_min, args):
         self.model = model
-        self.start_time = start_time
-        self.wake_time = wake_time
+        self.start_time = start_time # 탐색 시작 시각
+        self.wake_time = wake_time # 목표 기상 시각
         self.wake_window_min = wake_window_min
         self.args = args
-        self.setfinishtime = setfinishtime
 
         # 1. EEGReader 객체는 미리 생성해두지만, 연결은 하지 않습니다.
         self.eeg_reader = EEGReader(port=self.args.port, baudrate=self.args.baudrate)
@@ -124,7 +117,7 @@ class SmartAlarm:
                 
 
             # 4. 기상 윈도우에 진입했는지 확인
-            if is_within_wake_window(now_time, self.wake_time, self.wake_window_min):
+            if is_within_wake_window(now_time, self.start_time, self.wake_window_min):
                 # 5. EEG 리더가 아직 시작되지 않았다면, 여기서 시작합니다.
                 if not eeg_started:
                     #출력은 한국 시간
@@ -158,12 +151,7 @@ class SmartAlarm:
                         print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 새로운 EEG 특징이 아직 준비되지 않았습니다. 기다립니다...")
 
             # 목표 기상 시간이 되면 무조건 알람 울림
-            alarm_time = datetime.datetime.combine(datetime.datetime.now(timezone('Asia/Seoul')).date(), self.wake_time)
-            alarm_time = timezone('Asia/Seoul').localize(alarm_time)
-            if alarm_time>self.setfinishtime : 
-                alarm_time = alarm_time + datetime.timedelta(days = 1)
-            print(f'alarmtime: {alarm_time}, now_time: {now_time}')
-            if now_time > alarm_time:
+            if now_time > self.wake_time:
                 print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 목표 기상 시간 도달! 알람을 울립니다.")
                 trigger_alarm()
                 self.running = False # 알람 울렸으므로 종료
