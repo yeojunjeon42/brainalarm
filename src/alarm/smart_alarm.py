@@ -14,8 +14,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'processing'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'hardware'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'display'))
 
-#All time variables use UTC (python3)
-TIMEGAP = 60*60*9
+#All time variables use UTC+9 (python3)
 
 # 알람 작동
 def trigger_alarm():
@@ -35,14 +34,15 @@ def trigger_alarm():
 #         return True
 #     return False
 def is_within_wake_window(current_time, wake_time, window_min=15):
-    print('running')
+    print('is_within_wake_window --- running')
     current_time_timestamp = current_time.timestamp()
     print(current_time_timestamp)
-    alarm_time = datetime.datetime.combine(datetime.date.today(), wake_time)
+    # alarm_time = datetime.datetime.combine(datetime.date.today(), wake_time)
+    alarm_time = datetime.datetime.combine(datetime.datetime.now(timezone('Asia/Seoul')).date(), wake_time) 
     if alarm_time<current_time : 
       alarm_time = alarm_time + datetime.timedelta(days = 1)
       print('alarm_time_adjusted')
-    print(alarm_time)
+    print('set alarm time:', alarm_time)
     wake_time_timestamp = alarm_time.timestamp()
     print(wake_time_timestamp)
     if current_time_timestamp <= wake_time_timestamp and current_time_timestamp >= wake_time_timestamp + window_min*60:
@@ -58,11 +58,9 @@ def wait_until_start(start_datetime):
     UTC9_start_datetime = datetime.datetime.fromtimestamp(start_datetime.timestamp()+TIMEGAP)
     # 표기는 사용자 설정 시각인 UTC+9으로
     print(f"brainalarm 시작 예정 시각: {start_datetime.strftime('%H:%M:%S')}")
-    print("현재시각:", end = ' ')
-    print(start_datetime)
-    print(datetime.datetime.now())
-    print(datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S'))
-    while time.time() < start_datetime.timestamp() -TIMEGAP:
+    print('start_datetime: ', start_datetime)
+    print('현재시각: ',datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S'))
+    while datetime.datetime.now(timezone('Asia/Seoul')) < start_datetime:
         print('waiting until start time...', end='\r')
         time.sleep(5)
 
@@ -122,7 +120,7 @@ class SmartAlarm:
 
         while self.running:
             loop_start_time = time.monotonic()
-            now_time = datetime.datetime.now() #지금 한국 시간으로 바꿔야 함-> 처리는 UTC, 출력만 UTC+9
+            now_time = datetime.datetime.now(timezone('Asia/Seoul')) 
                 
 
             # 4. 기상 윈도우에 진입했는지 확인
@@ -143,26 +141,26 @@ class SmartAlarm:
                 # 6. EEG 리더가 성공적으로 시작된 후에만 아래 로직을 수행합니다.
                 if eeg_started:
                     if self.eeg_reader.new_feature_ready:
-                        print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}]New EEG feature available for prediction.")
+                        print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}]New EEG feature available for prediction.")
                         if self.eeg_reader.signal_quality > self.eeg_reader.noise_threshold:
-                            print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 신호 품질이 좋지 않습니다 ({self.eeg_reader.signal_quality}%). 다시 시도합니다.")
+                            print(f"[{datetime.datetime.now(timezone('Asia.Seoul')).strftime('%H:%M:%S')}] 신호 품질이 좋지 않습니다 ({self.eeg_reader.signal_quality}%). 다시 시도합니다.")
                         else:
                             feature_vector = self.eeg_reader.feature
                             feature = feature_vector.reshape(1, -1)
                             predicted_stage = self.model.predict(feature)[0]
-                            print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 현재 수면 단계 예측: {predicted_stage}")
+                            print(f"[{datetime.datetime.now(timezone('Asia.Seoul')).strftime('%H:%M:%S')}] 현재 수면 단계 예측: {predicted_stage}")
 
                             if predicted_stage == 1: # 얕은 수면으로 가정
-                                print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 얕은 수면 감지! 알람을 울립니다.")
+                                print(f"[{datetime.datetime.now(timezone('Asia.Seoul')).strftime('%H:%M:%S')}] 얕은 수면 감지! 알람을 울립니다.")
                                 trigger_alarm()
                                 self.running = False # 알람 울렸으므로 종료
                         self.eeg_reader.new_feature_ready = False
                     else:
-                        print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 새로운 EEG 특징이 아직 준비되지 않았습니다. 기다립니다...")
+                        print(f"[{datetime.datetime.now(timezone('Asia.Seoul')).strftime('%H:%M:%S')}] 새로운 EEG 특징이 아직 준비되지 않았습니다. 기다립니다...")
 
             # 목표 기상 시간이 되면 무조건 알람 울림
             if now_time >= self.wake_time:
-                print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 목표 기상 시간 도달! 알람을 울립니다.")
+                print(f"[{datetime.datetime.now(timezone('Asia.Seoul')).strftime('%H:%M:%S')}] 목표 기상 시간 도달! 알람을 울립니다.")
                 trigger_alarm()
                 self.running = False # 알람 울렸으므로 종료
 

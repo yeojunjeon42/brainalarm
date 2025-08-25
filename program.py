@@ -7,6 +7,7 @@ from src.alarm.smart_alarm import SmartAlarm
 import argparse
 import os
 import sys
+from pytz import timezone
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, 'models/final_model.joblib')
 
@@ -31,12 +32,10 @@ if system.set_time_fixed:
 
     # ✅ 3. 변환된 24시간제 시간으로 datetime.time 객체 생성
     # 튜플이 아닌, 각 값을 인자로 전달합니다.
-    if h_24==9:
-        wake_time = datetime.time(h_24-9, m)  # 기상 목표 시각
-    else:
-        wake_time = datetime.time(h_24+15, m)
+    wake_time = datetime.time(h_24, m)
     wake_window_min = system.wake_window_minutes  # 예정 시각 -wake_window_min만큼에서 N2 수면 단계 감지 시 알람 작동
-    start_time = datetime.datetime.combine(datetime.date.today(), wake_time)
+    start_time = datetime.datetime.combine(datetime.datetime.now(timezone('Asia/Seoul')).date(), wake_time) -datetime.timedelta(minutes= wake_window_min)
+    # datetime.datetime.combine(datetime.date.today(), wake_time)
             #   - datetime.timedelta(minutes=wake_window_min) # 탐색 시작 시각
     
     parser = argparse.ArgumentParser(description='EEG Data Reader for ThinkGear Protocol')
