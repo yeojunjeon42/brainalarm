@@ -9,6 +9,7 @@ import threading
 from typing import Optional
 from pytz import timezone
 
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'processing'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'hardware'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'display'))
@@ -27,12 +28,28 @@ def trigger_alarm():
 # wake window 내에 있는지 확인
 #def  is_within_wake_window(datetime.datetime, datetime.time, int)
 #wake_time은 current_time과 비교하여 알맞는 년, 월, 일, 시간, 분, 초에 설정되어야함
+# def is_within_wake_window(current_time, wake_time, window_min=15):
+#     current_time_timestamp = current_time.timestamp()
+#     wake_time_timestamp = wake_time.timestamp()
+#     if current_time_timestamp <= wake_time_timestamp and current_time_timestamp >= wake_time_timestamp + window_min*60:
+#         return True
+#     return False
 def is_within_wake_window(current_time, wake_time, window_min=15):
     current_time_timestamp = current_time.timestamp()
-    wake_time_timestamp = wake_time.timestamp()
+    print(current_time_timestamp)
+    alarm_time = datetime.datetime.combine(datetime.date.today(), wake_time)
+    if alarm_time<current_time : 
+      alarm_time = alarm_time + datetime.timedelta(days = 1)
+      print('yes')
+    print(alarm_time)
+    wake_time_timestamp = alarm_time.timestamp()
+    print(wake_time_timestamp)
     if current_time_timestamp <= wake_time_timestamp and current_time_timestamp >= wake_time_timestamp + window_min*60:
         return True
     return False
+
+
+
 
 # 대기 함수
 # def wait_until_start(start_datetime : datetime.datetime, UTC+9로 입력됨)
@@ -101,14 +118,15 @@ class SmartAlarm:
 
         while self.running:
             loop_start_time = time.monotonic()
-            now_time = time.time() #지금 한국 시간으로 바꿔야 함##############################################
+            now_time = datetime.datetime.now() #지금 한국 시간으로 바꿔야 함-> 처리는 UTC, 출력만 UTC+9
 
             # 4. 기상 윈도우에 진입했는지 확인
             if is_within_wake_window(now_time, self.wake_time, self.wake_window_min):
                 self.oled_system.running = False # OLED 시간 설정 모드 종료
                 # 5. EEG 리더가 아직 시작되지 않았다면, 여기서 시작합니다.
                 if not eeg_started:
-                    print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 기상 윈도우 진입. EEG 데이터 수집을 시작합니다.")
+                    #출력은 한국 시간
+                    print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 기상 윈도우 진입. EEG 데이터 수집을 시작합니다.")
                     if self.eeg_reader.connect():
                         self.eeg_reader.start(mode='parsed')
                         eeg_started = True
