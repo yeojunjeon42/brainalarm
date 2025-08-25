@@ -35,12 +35,13 @@ def trigger_alarm():
 #         return True
 #     return False
 def is_within_wake_window(current_time, wake_time, window_min=15):
+    print('running')
     current_time_timestamp = current_time.timestamp()
     print(current_time_timestamp)
     alarm_time = datetime.datetime.combine(datetime.date.today(), wake_time)
     if alarm_time<current_time : 
       alarm_time = alarm_time + datetime.timedelta(days = 1)
-      print('yes')
+      print('alarm_time_adjusted')
     print(alarm_time)
     wake_time_timestamp = alarm_time.timestamp()
     print(wake_time_timestamp)
