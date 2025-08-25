@@ -14,6 +14,7 @@ MODEL_PATH = os.path.join(BASE_DIR, 'models/final_model.joblib')
 
 system = OLEDTimeSetter()
 system.run()
+print(f'kaa{system.set_is_pm}')
 
 # 사용자 설정
 if system.set_time_fixed:
@@ -21,6 +22,7 @@ if system.set_time_fixed:
     h_12 = system.set_hour
     m = system.set_minute
     is_pm = system.set_is_pm
+    print(f'aaa{is_pm}')
     # 2. 24시간제로 변환
     h_24 = h_12
     if is_pm and h_12 != 12:
