@@ -312,8 +312,7 @@ class OLEDTimeSetter:
         except KeyboardInterrupt:
             print("\nShutting down...")
         finally:
-            self.running = False
-            # self.cleanup()
+            self.cleanup()
     
     def cleanup(self):
         """Clean up resources"""

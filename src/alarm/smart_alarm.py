@@ -59,9 +59,12 @@ def wait_until_start(start_datetime):
     # 표기는 사용자 설정 시각인 UTC+9으로
     print(f"brainalarm 시작 예정 시각: {start_datetime.strftime('%H:%M:%S')}")
     print("현재시각:", end = ' ')
+    print(start_datetime)
+    print(datetime.datetime.now())
     print(datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S'))
     while time.time() < start_datetime.timestamp() -TIMEGAP:
-        time.sleep(30)
+        print('waiting until start time...', end='\r')
+        time.sleep(5)
 
 class SmartAlarm:
     def __init__(self, model, start_time, wake_time, wake_window_min, args, oled_system):
@@ -114,7 +117,7 @@ class SmartAlarm:
     def _alarm_loop(self):
         """(스레드에서 실행됨) 스마트 알람 메인 로직."""
         wait_until_start(self.start_time)
-        
+        print('alarm loop started')
         eeg_started = False # EEG 리더가 시작되었는지 확인하는 플래그
 
         while self.running:
