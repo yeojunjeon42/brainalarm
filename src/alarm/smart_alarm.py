@@ -163,6 +163,7 @@ class SmartAlarm:
             alarm_time = timezone('Asia/Seoul').localize(alarm_time)
             if alarm_time>self.setfinishtime : 
                 alarm_time = alarm_time + datetime.timedelta(days = 1)
+            print(f'alarmtime: {alarm_time}, now_time: {now_time}')
             if now_time > alarm_time:
                 print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 목표 기상 시간 도달! 알람을 울립니다.")
                 trigger_alarm()
