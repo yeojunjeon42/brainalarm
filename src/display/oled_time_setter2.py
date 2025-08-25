@@ -276,9 +276,6 @@ class OLEDTimeSetter:
                 if self.last_set_state == 1 and set_state == 0:
                     if self.interface_mode == 'WINDOW': self.confirm_window()
                     elif self.interface_mode == 'TIME': self.confirm_time()
-                    elif self.interface_mode == 'CLOCK':
-                        self.interface_mode = 'TIME'
-                        self.time_is_blinking = False
                 self.last_set_state = set_state
                 
                 clk_state = GPIO.input(self.CLK)

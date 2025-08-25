@@ -30,7 +30,7 @@ if system.set_time_fixed:
     # ✅ 3. 변환된 24시간제 시간으로 datetime.time 객체 생성
     # 튜플이 아닌, 각 값을 인자로 전달합니다.
     wake_time = datetime.time(h_24, m)  # 기상 목표 시각
-    wake_window_min = system.wake_window  # 예정 시각 -wake_window_min만큼에서 N2 수면 단계 감지 시 알람 작동
+    wake_window_min = system.wake_window_minutes  # 예정 시각 -wake_window_min만큼에서 N2 수면 단계 감지 시 알람 작동
     start_time = (datetime.datetime.combine(datetime.date.today(), wake_time)
               - datetime.timedelta(minutes=wake_window_min)) # 탐색 시작 시각
     
