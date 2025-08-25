@@ -17,6 +17,7 @@ system.run()
 
 # 사용자 설정
 if system.set_time_fixed:
+    setfinishtime = datetime.datetime.now(timezone('Asia/Seoul')) 
     h_12 = system.set_hour
     m = system.set_minute
     is_pm = system.set_is_pm
@@ -55,7 +56,7 @@ if system.set_time_fixed:
 
 
     # 실행--> UTC + 9기준으로 입력됨
-    alarm_system = SmartAlarm(sleep_stage_model, start_time, wake_time, wake_window_min, args, system)
+    alarm_system = SmartAlarm(sleep_stage_model, start_time, wake_time, wake_window_min, args, system, setfinishtime)
 
     try:
         alarm_system.start()
