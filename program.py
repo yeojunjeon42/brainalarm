@@ -28,7 +28,7 @@ if system.set_time_fixed:
     h_24 = h_24 % 24
 
     #UTC로 변환
-    if h_24>9:
+    if h_24>=9:
         h_24-=9
     else:
         h_24 = h_24+15
