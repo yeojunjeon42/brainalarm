@@ -37,7 +37,7 @@ if system.set_time_fixed:
     start_time = datetime.datetime.combine(datetime.datetime.now(timezone('Asia/Seoul')).date(), wake_time) -datetime.timedelta(minutes= wake_window_min)
     # datetime.datetime.combine(datetime.date.today(), wake_time)
             #   - datetime.timedelta(minutes=wake_window_min) # 탐색 시작 시각
-    
+    start_time = timezone('Asia/Seoul').localize(start_time)
     parser = argparse.ArgumentParser(description='EEG Data Reader for ThinkGear Protocol')
     parser.add_argument('--port', '-p', default='/dev/serial0', 
                        help='Serial port (default: /dev/serial0)')
