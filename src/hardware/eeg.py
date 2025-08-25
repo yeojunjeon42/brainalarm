@@ -367,8 +367,6 @@ class EEGReader:
                         timestamp = time.strftime("%H:%M:%S.%f")[:-3]
                         hex_data = ' '.join([f'{b:02X}' for b in data])
                         
-                        # Raw Hex 출력
-                        print(f"[{timestamp}] RAW HEX: {hex_data}")
                         
                         # 각 바이트를 파서로 전달
                         for byte_val in data:
