@@ -143,20 +143,20 @@ class SmartAlarm:
                     if self.eeg_reader.new_feature_ready:
                         print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}]New EEG feature available for prediction.")
                         if self.eeg_reader.signal_quality > self.eeg_reader.noise_threshold:
-                            print(f"[{datetime.datetime.now(timezone('Asia.Seoul')).strftime('%H:%M:%S')}] 신호 품질이 좋지 않습니다 ({self.eeg_reader.signal_quality}%). 다시 시도합니다.")
+                            print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 신호 품질이 좋지 않습니다 ({self.eeg_reader.signal_quality}%). 다시 시도합니다.")
                         else:
                             feature_vector = self.eeg_reader.feature
                             feature = feature_vector.reshape(1, -1)
                             predicted_stage = self.model.predict(feature)[0]
-                            print(f"[{datetime.datetime.now(timezone('Asia.Seoul')).strftime('%H:%M:%S')}] 현재 수면 단계 예측: {predicted_stage}")
+                            print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 현재 수면 단계 예측: {predicted_stage}")
 
                             if predicted_stage == 1: # 얕은 수면으로 가정
-                                print(f"[{datetime.datetime.now(timezone('Asia.Seoul')).strftime('%H:%M:%S')}] 얕은 수면 감지! 알람을 울립니다.")
+                                print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 얕은 수면 감지! 알람을 울립니다.")
                                 trigger_alarm()
                                 self.running = False # 알람 울렸으므로 종료
                         self.eeg_reader.new_feature_ready = False
                     else:
-                        print(f"[{datetime.datetime.now(timezone('Asia.Seoul')).strftime('%H:%M:%S')}] 새로운 EEG 특징이 아직 준비되지 않았습니다. 기다립니다...")
+                        print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 새로운 EEG 특징이 아직 준비되지 않았습니다. 기다립니다...")
 
             # 목표 기상 시간이 되면 무조건 알람 울림
             alarm_time = datetime.datetime.combine(datetime.datetime.now(timezone('Asia/Seoul')).date(), self.wake_time)
@@ -164,7 +164,7 @@ class SmartAlarm:
             if alarm_time>self.setfinishtime : 
                 alarm_time = alarm_time + datetime.timedelta(days = 1)
             if now_time > alarm_time:
-                print(f"[{datetime.datetime.now(timezone('Asia.Seoul')).strftime('%H:%M:%S')}] 목표 기상 시간 도달! 알람을 울립니다.")
+                print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 목표 기상 시간 도달! 알람을 울립니다.")
                 trigger_alarm()
                 self.running = False # 알람 울렸으므로 종료
 
