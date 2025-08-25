@@ -35,9 +35,7 @@ if system.set_time_fixed:
     if wake_time < now:
         wake_time = wake_time + datetime.timedelta(days=1)
     wake_window_min = system.wake_window_minutes  # 예정 시각 -wake_window_min만큼에서 N2 수면 단계 감지 시 알람 작동
-    start_time = wake_time -datetime.timedelta(minutes= wake_window_min)
-    # datetime.datetime.combine(datetime.date.today(), wake_time)
-            #   - datetime.timedelta(minutes=wake_window_min) # 탐색 시작 시각
+    start_time = wake_time - datetime.timedelta(minutes= wake_window_min)
     start_time = timezone('Asia/Seoul').localize(start_time)
     parser = argparse.ArgumentParser(description='EEG Data Reader for ThinkGear Protocol')
     parser.add_argument('--port', '-p', default='/dev/serial0', 
