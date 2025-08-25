@@ -19,16 +19,10 @@ print(f'kaa{system.set_is_pm}')
 # 사용자 설정
 if system.set_time_fixed:
     setfinishtime = datetime.datetime.now(timezone('Asia/Seoul')) 
-    h_12 = system.set_hour
+    h_24 = system.set_hour
     m = system.set_minute
     is_pm = system.set_is_pm
     print(f'aaa{is_pm}')
-    # 2. 24시간제로 변환
-    h_24 = h_12
-    if is_pm and h_12 != 12:
-        h_24 += 12
-    elif not is_pm and h_12 == 12:
-        h_24 = 0
     h_24 = h_24 % 24
 
 
