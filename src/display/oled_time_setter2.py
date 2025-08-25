@@ -303,7 +303,7 @@ class OLEDTimeSetter:
             print("Press Ctrl+C to stop")
             print("=" * 50)
             
-            while self.running:
+            while not self.set_time_fixed:
                 self.update_display()
                 time.sleep(0.1)
                 
@@ -318,7 +318,6 @@ class OLEDTimeSetter:
         self.draw.rectangle((0, 0, 128, 64), outline=0, fill=0)
         self.oled.image(self.image)
         self.oled.show()
-        GPIO.cleanup()
         print("Cleanup completed")
 
 def main():
