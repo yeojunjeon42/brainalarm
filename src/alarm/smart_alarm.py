@@ -55,7 +55,6 @@ def is_within_wake_window(current_time, wake_time, window_min=15):
 # 대기 함수
 # def wait_until_start(start_datetime : datetime.datetime, UTC+9로 입력됨)
 def wait_until_start(start_datetime):
-    UTC9_start_datetime = datetime.datetime.fromtimestamp(start_datetime.timestamp()+TIMEGAP)
     # 표기는 사용자 설정 시각인 UTC+9으로
     print(f"brainalarm 시작 예정 시각: {start_datetime.strftime('%H:%M:%S')}")
     print('start_datetime: ', start_datetime)
