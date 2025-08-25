@@ -320,7 +320,6 @@ class OLEDTimeSetter:
         self.draw.rectangle((0, 0, 128, 64), outline=0, fill=0)
         self.oled.image(self.image)
         self.oled.show()
-        GPIO.cleanup()
         print("Cleanup completed")
 
 def main():
