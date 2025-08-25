@@ -8,7 +8,7 @@ import os
 import threading
 from typing import Optional
 from pytz import timezone
-import pandas as pd
+import numpy as np
 
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'processing'))
@@ -138,7 +138,7 @@ class SmartAlarm:
                         if self.eeg_reader.signal_quality > self.eeg_reader.noise_threshold:
                             print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 신호 품질이 좋지 않습니다 ({self.eeg_reader.signal_quality}%). 다시 시도합니다.")
                         else:
-                            feature_vector = pd.DataFrame(self.eeg_reader.feature)
+                            feature_vector = np.array(self.eeg_reader.feature)
                             feature_vector.reshape(-1,7)
                             predicted_stage = self.model.predict(feature_vector)[0]
                             print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 현재 수면 단계 예측: {predicted_stage}")
