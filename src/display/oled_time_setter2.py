@@ -14,6 +14,7 @@ import board
 import busio
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
+from pytz import timezone
 
 TIMEGAP = 60*60*9 # UTC+9 (Seoul)
 
@@ -180,7 +181,7 @@ class OLEDTimeSetter:
     
     def draw_clock_interface(self):
         """Draw the clock interface showing current time and alarm time"""
-        now = datetime.datetime.now() + datetime.timedelta(hours=9) # KST
+        now = datetime.datetime.now(timezone('Asia/Seoul'))  # KST
         current_hour = now.hour
         
         display_current_hour = current_hour
