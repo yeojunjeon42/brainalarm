@@ -301,7 +301,6 @@ class EEGReader:
                 raw_val = value
             if raw_val > 32768:
                 raw_val -= 65536
-            print(f"[{timestamp}] Raw Signal: {raw_val}")
             new_feature, is_ready = self.feature_extractor.add_sample(raw_val)
             if is_ready:
                 self.feature = new_feature
