@@ -56,7 +56,7 @@ if system.set_time_fixed:
 
 
     # 실행--> UTC + 9기준으로 입력됨
-    alarm_system = SmartAlarm(sleep_stage_model, start_time, wake_time, wake_window_min, args, system, setfinishtime)
+    alarm_system = SmartAlarm(sleep_stage_model, start_time, wake_time, wake_window_min, args, setfinishtime)
 
     try:
         alarm_system.start()
