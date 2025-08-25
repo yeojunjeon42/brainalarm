@@ -38,7 +38,8 @@ def is_within_wake_window(current_time, wake_time, window_min=15):
     current_time_timestamp = current_time.timestamp()
     print(current_time_timestamp)
     # alarm_time = datetime.datetime.combine(datetime.date.today(), wake_time)
-    alarm_time = datetime.datetime.combine(datetime.datetime.now(timezone('Asia/Seoul')).date(), wake_time) 
+    alarm_time = datetime.datetime.combine(datetime.datetime.now(timezone('Asia/Seoul')).date(), wake_time)
+    alarm_time = timezone('Asia/Seoul').localize(alarm_time)
     if alarm_time<current_time : 
       alarm_time = alarm_time + datetime.timedelta(days = 1)
       print('alarm_time_adjusted')
