@@ -17,6 +17,7 @@ system.run()
 
 # 사용자 설정
 if system.set_time_fixed:
+    setfinishtime = datetime.datetime.now(timezone('Asia/Seoul')) 
     h_12 = system.set_hour
     m = system.set_minute
     is_pm = system.set_is_pm
@@ -37,7 +38,7 @@ if system.set_time_fixed:
     start_time = datetime.datetime.combine(datetime.datetime.now(timezone('Asia/Seoul')).date(), wake_time) -datetime.timedelta(minutes= wake_window_min)
     # datetime.datetime.combine(datetime.date.today(), wake_time)
             #   - datetime.timedelta(minutes=wake_window_min) # 탐색 시작 시각
-    
+    start_time = timezone('Asia/Seoul').localize(start_time)
     parser = argparse.ArgumentParser(description='EEG Data Reader for ThinkGear Protocol')
     parser.add_argument('--port', '-p', default='/dev/serial0', 
                        help='Serial port (default: /dev/serial0)')
@@ -55,7 +56,7 @@ if system.set_time_fixed:
 
 
     # 실행--> UTC + 9기준으로 입력됨
-    alarm_system = SmartAlarm(sleep_stage_model, start_time, wake_time, wake_window_min, args, system)
+    alarm_system = SmartAlarm(sleep_stage_model, start_time, wake_time, wake_window_min, args, system, setfinishtime)
 
     try:
         alarm_system.start()
