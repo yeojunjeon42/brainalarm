@@ -64,7 +64,7 @@ def wait_until_start(start_datetime):
     print(datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S'))
     while time.time() < start_datetime.timestamp() -TIMEGAP:
         print('waiting until start time...', end='\r')
-        time.sleep(30)
+        time.sleep(5)
 
 class SmartAlarm:
     def __init__(self, model, start_time, wake_time, wake_window_min, args, oled_system):
