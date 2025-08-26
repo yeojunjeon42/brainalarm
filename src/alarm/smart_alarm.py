@@ -9,6 +9,7 @@ import threading
 from typing import Optional
 from pytz import timezone
 import numpy as np
+from src.display.oled_time_setter2 import OledTimeSetter
 
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'processing'))
@@ -60,12 +61,13 @@ def wait_until_start(start_datetime):
         time.sleep(5)
 
 class SmartAlarm:
-    def __init__(self, model, start_time, wake_time, wake_window_min, args):
+    def __init__(self, model, start_time, wake_time, wake_window_min, args, oled->OledTimeSetter):
         self.model = model
         self.start_time = start_time # 탐색 시작 시각
         self.wake_time = wake_time # 목표 기상 시각
         self.wake_window_min = wake_window_min
         self.args = args
+        self.oled = oled
 
         # 1. EEGReader 객체는 미리 생성해두지만, 연결은 하지 않습니다.
         self.eeg_reader = EEGReader(port=self.args.port, baudrate=self.args.baudrate)
@@ -115,6 +117,7 @@ class SmartAlarm:
         while self.running:
             loop_start_time = time.monotonic()
             now_time = datetime.datetime.now(timezone('Asia/Seoul')) 
+            self.oled.draw_clock_interface()
                 
 
             # 4. 기상 윈도우에 진입했는지 확인

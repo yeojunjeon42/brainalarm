@@ -48,10 +48,12 @@ if system.set_time_fixed:
     # 모델 로드
     sleep_stage_model = joblib.load(MODEL_PATH)
 
+    system2 = OLEDTimeSetter()
+
 
 
     # 실행--> UTC + 9기준으로 입력됨
-    alarm_system = SmartAlarm(sleep_stage_model, start_time, wake_time, wake_window_min, args)
+    alarm_system = SmartAlarm(sleep_stage_model, start_time, wake_time, wake_window_min, args, system2)
 
     try:
         alarm_system.start()
