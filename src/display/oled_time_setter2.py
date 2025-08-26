@@ -19,7 +19,7 @@ from pytz import timezone
 TIMEGAP = 60*60*9 # UTC+9 (Seoul)
 
 class OLEDTimeSetter:
-    def __init__(self):
+    def __init__(self, wake_time):
         # GPIO Setup
         GPIO.cleanup()
         GPIO.setwarnings(False)
@@ -52,6 +52,7 @@ class OLEDTimeSetter:
         self.set_is_pm = True
         self.set_time_fixed = False  # Has the time been confirmed?
         self.settime = time.time()   # Unix timestamp for the set wake time
+        self.wake_time = wake_time
         
         # Interface state management
         self.interface_mode = 'WINDOW'  # WINDOW, TIME, CLOCK
@@ -192,12 +193,12 @@ class OLEDTimeSetter:
         ampm_x = (128 - (ampm_bbox[2] - ampm_bbox[0])) // 2
         self.draw.text((ampm_x, 40), current_ampm, font=self.ampm_font, fill=255)
         
-        alarm_dt = datetime.datetime.fromtimestamp(self.settime + TIMEGAP)
-        alarm_hour = alarm_dt.hour
+        # alarm_dt = datetime.datetime.fromtimestamp(self.settime + TIMEGAP)
+        # alarm_hour = alarm_dt.hour
         
-        display_alarm_hour = alarm_hour
+        # display_alarm_hour = alarm_hour
 
-        alarm_text = f"{display_alarm_hour:02d}:{alarm_dt.minute:02d}"
+        alarm_text = f"{self.wake_time.hour:02d}:{self.wake_time.minute:02d}"
         alarm_bbox = self.draw.textbbox((0, 0), alarm_text, font=self.ampm_font)
         alarm_x = 128 - (alarm_bbox[2] - alarm_bbox[0]) - 2
         

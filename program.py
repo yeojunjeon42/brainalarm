@@ -48,7 +48,7 @@ if system.set_time_fixed:
     # 모델 로드
     sleep_stage_model = joblib.load(MODEL_PATH)
 
-    system2 = OLEDTimeSetter()
+    system2 = OLEDTimeSetter(wake_time)
 
 
 
