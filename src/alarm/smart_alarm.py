@@ -49,6 +49,8 @@ def wait_until_start(self, start_datetime):
     print('현재시각: ',datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S'))
     while datetime.datetime.now(timezone('Asia/Seoul')) < start_datetime:
         print('waiting until start time...', end='\r')
+        gpio_thread = threading.Thread(target=self.oled.handle_gpioreset, daemon=True)
+        gpio_thread.start()
         self.oled.interface_mode = 'CLOCK'
         self.oled.update_display()
         time.sleep(5)
@@ -110,8 +112,6 @@ class SmartAlarm:
         eeg_started = False # EEG 리더가 시작되었는지 확인하는 플래그
 
         while self.running:
-            gpio_thread = threading.Thread(target=self.oled.handle_gpioreset, daemon=True)
-            gpio_thread.start()
             loop_start_time = time.monotonic()
             now_time = datetime.datetime.now(timezone('Asia/Seoul'))
             self.oled.interface_mode = 'CLOCK'
