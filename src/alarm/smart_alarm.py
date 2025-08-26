@@ -61,7 +61,7 @@ def wait_until_start(start_datetime):
         time.sleep(5)
 
 class SmartAlarm:
-    def __init__(self, model, start_time, wake_time, wake_window_min, args, oled->OledTimeSetter):
+    def __init__(self, model, start_time, wake_time, wake_window_min, args, oled):
         self.model = model
         self.start_time = start_time # 탐색 시작 시각
         self.wake_time = wake_time # 목표 기상 시각
