@@ -108,7 +108,7 @@ class SmartAlarm:
         while self.running:
             loop_start_time = time.monotonic()
             now_time = datetime.datetime.now(timezone('Asia/Seoul'))
-            self.draw.rectangle((0, 0, 128, 64), outline=0, fill=0)
+            self.oled.draw.rectangle((0, 0, 128, 64), outline=0, fill=0)
             self.oled.draw_clock_interface()
             self.oled.image(self.image)
             self.oled.show()
