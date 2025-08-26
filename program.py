@@ -14,14 +14,12 @@ MODEL_PATH = os.path.join(BASE_DIR, 'models/final_modelwsp.joblib')
 
 system = OLEDTimeSetter()
 system.run()
-print(f'kaa{system.set_is_pm}')
 
 # 사용자 설정
 if system.set_time_fixed:
     h_24 = system.set_hour
     m = system.set_minute
     is_pm = system.set_is_pm
-    print(f'aaa{is_pm}')
     h_24 = h_24 % 24
 
 
