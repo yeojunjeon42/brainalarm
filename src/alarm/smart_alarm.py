@@ -42,14 +42,15 @@ def is_within_wake_window(current_time, start_time, window_min=15):
 
 # 대기 함수
 # def wait_until_start(start_datetime : datetime.datetime, UTC+9로 입력됨)
-def wait_until_start(start_datetime):
+def wait_until_start(self, start_datetime):
     # 표기는 사용자 설정 시각인 UTC+9으로
     print(f"brainalarm 시작 예정 시각: {start_datetime.strftime('%H:%M:%S')}")
     print('start_datetime: ', start_datetime)
     print('현재시각: ',datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S'))
-    
     while datetime.datetime.now(timezone('Asia/Seoul')) < start_datetime:
         print('waiting until start time...', end='\r')
+        self.oled.interface_mode = 'CLOCK'
+        self.oled.update_display()
         time.sleep(5)
 
 class SmartAlarm:
@@ -104,7 +105,7 @@ class SmartAlarm:
         """(스레드에서 실행됨) 스마트 알람 메인 로직."""
         # 목표 기상 시간이 되면 무조건 알람 울림
 
-        wait_until_start(self.start_time)
+        wait_until_start(self, self.start_time)
         print('alarm loop started')
         eeg_started = False # EEG 리더가 시작되었는지 확인하는 플래그
 
