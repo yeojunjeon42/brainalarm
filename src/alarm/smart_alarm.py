@@ -103,6 +103,7 @@ class SmartAlarm:
     def _alarm_loop(self):
         """(스레드에서 실행됨) 스마트 알람 메인 로직."""
         # 목표 기상 시간이 되면 무조건 알람 울림
+        now_time = datetime.datetime.now(timezone('Asia/Seoul'))
         if now_time > self.wake_time:
             print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 목표 기상 시간 도달! 알람을 울립니다.")
             trigger_alarm()
