@@ -194,8 +194,6 @@ class OLEDTimeSetter:
         alarm_hour = alarm_dt.hour
         
         display_alarm_hour = alarm_hour
-        if display_alarm_hour == 0: display_alarm_hour = 12
-        elif display_alarm_hour > 12: display_alarm_hour -= 12
 
         alarm_text = f"{display_alarm_hour:02d}:{alarm_dt.minute:02d}"
         alarm_bbox = self.draw.textbbox((0, 0), alarm_text, font=self.ampm_font)
