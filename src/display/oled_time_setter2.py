@@ -211,8 +211,8 @@ class OLEDTimeSetter:
             alarm_bbox = self.draw.textbbox((0, 0), alarm_text, font=self.ampm_font)
             alarm_x = 128 - (alarm_bbox[2] - alarm_bbox[0]) - 2
             
-            self.draw.text((alarm_x, 54), alarm_text, font=self.ampm_font, fill=255)
-            self.draw.text((alarm_x - 12, 54), "⏰", font=self.ampm_font, fill=255)
+            self.draw.text((alarm_x, 48), alarm_text, font=self.ampm_font, fill=255)
+            self.draw.text((alarm_x - 12, 48), font=self.ampm_font, fill=255)
 
     def adjust_window(self, increment):
         """Adjust wake window by increment"""
