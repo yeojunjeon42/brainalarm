@@ -283,15 +283,15 @@ class EEGReader:
             
         elif code == CODE_ATTENTION:
             attention = value[0] if isinstance(value, (bytes, bytearray)) else value
-            print(f"[{timestamp}] Attention: {attention}")
+            #print(f"[{timestamp}] Attention: {attention}")
             
         elif code == CODE_MEDITATION:
             meditation = value[0] if isinstance(value, (bytes, bytearray)) else value
-            print(f"[{timestamp}] Meditation: {meditation}")
+            #print(f"[{timestamp}] Meditation: {meditation}")
             
         elif code == CODE_BLINK_STRENGTH:
             blink = value[0] if isinstance(value, (bytes, bytearray)) else value
-            print(f"[{timestamp}] Blink Strength: {blink}")
+            #print(f"[{timestamp}] Blink Strength: {blink}")
 
             
         elif code == CODE_RAW_SIGNAL:
