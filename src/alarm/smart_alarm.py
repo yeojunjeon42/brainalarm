@@ -47,10 +47,10 @@ def wait_until_start(self, start_datetime):
     print(f"brainalarm 시작 예정 시각: {start_datetime.strftime('%H:%M:%S')}")
     print('start_datetime: ', start_datetime)
     print('현재시각: ',datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S'))
-    self.oled.interface_mode = 'CLOCK'
-    self.oled.update_display()
     while datetime.datetime.now(timezone('Asia/Seoul')) < start_datetime:
         print('waiting until start time...', end='\r')
+        self.oled.interface_mode = 'CLOCK'
+        self.oled.update_display()
         time.sleep(5)
 
 class SmartAlarm:
