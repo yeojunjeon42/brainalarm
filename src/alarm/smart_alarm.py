@@ -117,6 +117,7 @@ class SmartAlarm:
                 print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 목표 기상 시간 도달! 알람을 울립니다.")
                 trigger_alarm()
                 self.running = False # 알람 울렸으므로 종료
+                self.eeg_reader.disconnect()
                 
 
             # 4. 기상 윈도우에 진입했는지 확인
@@ -148,6 +149,7 @@ class SmartAlarm:
                                 print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 얕은 수면 감지! 알람을 울립니다.")
                                 trigger_alarm()
                                 self.running = False # 알람 울렸으므로 종료
+                                self.eeg_reader.disconnect()
                         self.eeg_reader.new_feature_ready = False
                     else:
                         print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 새로운 EEG 특징이 아직 준비되지 않았습니다. 기다립니다...")
