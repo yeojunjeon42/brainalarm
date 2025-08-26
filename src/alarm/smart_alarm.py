@@ -109,6 +109,8 @@ class SmartAlarm:
         eeg_started = False # EEG 리더가 시작되었는지 확인하는 플래그
 
         while self.running:
+            gpio_thread = threading.Thread(target=self.oled.handle_gpioreset, daemon=True)
+            gpio_thread.start()
             loop_start_time = time.monotonic()
             now_time = datetime.datetime.now(timezone('Asia/Seoul'))
             self.oled.interface_mode = 'CLOCK'
