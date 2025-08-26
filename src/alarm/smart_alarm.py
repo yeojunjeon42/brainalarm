@@ -67,16 +67,6 @@ class SmartAlarm:
         self.thread: Optional[threading.Thread] = None
         self.running = False
     
-    def wait_until_start(self, start_datetime):
-    # 표기는 사용자 설정 시각인 UTC+9으로
-    print(f"brainalarm 시작 예정 시각: {start_datetime.strftime('%H:%M:%S')}")
-    print('start_datetime: ', start_datetime)
-    print('현재시각: ',datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S'))
-    while datetime.datetime.now(timezone('Asia/Seoul')) < start_datetime:
-        print('waiting until start time...', end='\r')
-        self.oled.interface_mode = 'CLOCK'
-        self.oled.update_display()
-        time.sleep(5)
 
     def start(self):
         """알람 루프 스레드를 시작합니다. EEG 리더는 아직 시작하지 않습니다."""
