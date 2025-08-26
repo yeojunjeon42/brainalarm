@@ -72,8 +72,8 @@ class OLEDTimeSetter:
         # Load fonts
         try:
             self.time_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
-            self.ampm_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
-            self.window_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 15)
+            self.ampm_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 12)
+            self.window_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 18)
         except IOError:
             self.time_font = ImageFont.load_default()
             self.ampm_font = ImageFont.load_default()
@@ -168,7 +168,7 @@ class OLEDTimeSetter:
         window_info = f"{self.wake_window_minutes}m before"
         window_bbox = self.draw.textbbox((0, 0), window_info, font=self.ampm_font)
         window_x = (128 - (window_bbox[2] - window_bbox[0])) // 2
-        self.draw.text((window_x, 54), window_info, font=self.ampm_font, fill=255)
+        self.draw.text((window_x, 50), window_info, font=self.ampm_font, fill=255)
     
     def draw_clock_interface(self):
         """Draw the clock interface showing current time and alarm time"""
