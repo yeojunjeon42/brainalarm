@@ -6,6 +6,7 @@ from src.hardware.eeg import EEGReader
 import sys
 import os
 import threading
+from PIL import Image
 from typing import Optional
 from pytz import timezone
 import numpy as np
@@ -108,10 +109,8 @@ class SmartAlarm:
         while self.running:
             loop_start_time = time.monotonic()
             now_time = datetime.datetime.now(timezone('Asia/Seoul'))
-            self.oled.draw.rectangle((0, 0, 128, 64), outline=0, fill=0)
-            self.oled.draw_clock_interface()
-            self.oled.image(self.oled.image)
-            self.oled.show()
+            self.oled.interface_mode = 'CLOCK'
+            self.oled.update_display()
                 
 
             # 4. 기상 윈도우에 진입했는지 확인
