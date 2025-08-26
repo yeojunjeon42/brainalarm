@@ -103,16 +103,16 @@ class SmartAlarm:
     def _alarm_loop(self):
         """(스레드에서 실행됨) 스마트 알람 메인 로직."""
         # 목표 기상 시간이 되면 무조건 알람 울림
-        now_time = datetime.datetime.now(timezone('Asia/Seoul'))
-        if now_time > self.wake_time:
-            print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 목표 기상 시간 도달! 알람을 울립니다.")
-            trigger_alarm()
-            self.running = False # 알람 울렸으므로 종료
+
         wait_until_start(self.start_time)
         print('alarm loop started')
         eeg_started = False # EEG 리더가 시작되었는지 확인하는 플래그
 
         while self.running:
+            if now_time > self.wake_time:
+                print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 목표 기상 시간 도달! 알람을 울립니다.")
+                trigger_alarm()
+                self.running = False # 알람 울렸으므로 종료
             loop_start_time = time.monotonic()
             now_time = datetime.datetime.now(timezone('Asia/Seoul'))
             self.oled.interface_mode = 'CLOCK'

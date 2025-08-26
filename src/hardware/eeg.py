@@ -278,7 +278,7 @@ class EEGReader:
         
         if code == CODE_POOR_SIGNAL:
             signal_quality = 100 - value[0] if isinstance(value, (bytes, bytearray)) else 100 - value
-            print(f"[{timestamp}] Signal Quality: {signal_quality}%")
+            #print(f"[{timestamp}] Signal Quality: {signal_quality}%")
             self.signal_quality = signal_quality
             
         elif code == CODE_ATTENTION:
@@ -305,7 +305,7 @@ class EEGReader:
             if is_ready:
                 self.feature = new_feature
                 self.new_feature_ready = True
-                print(f"[{timestamp}] New 30s epoch feature extracted.")
+                #print(f"[{timestamp}] New 30s epoch feature extracted.")
             
             
         else:
