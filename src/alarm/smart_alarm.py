@@ -107,6 +107,11 @@ class SmartAlarm:
         eeg_started = False # EEG 리더가 시작되었는지 확인하는 플래그
 
         while self.running:
+            # 목표 기상 시간이 되면 무조건 알람 울림
+            if now_time > self.wake_time:
+                print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 목표 기상 시간 도달! 알람을 울립니다.")
+                trigger_alarm()
+                self.running = False # 알람 울렸으므로 종료
             loop_start_time = time.monotonic()
             now_time = datetime.datetime.now(timezone('Asia/Seoul'))
             self.oled.interface_mode = 'CLOCK'
@@ -146,11 +151,6 @@ class SmartAlarm:
                     else:
                         print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 새로운 EEG 특징이 아직 준비되지 않았습니다. 기다립니다...")
 
-            # 목표 기상 시간이 되면 무조건 알람 울림
-            if now_time > self.wake_time:
-                print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 목표 기상 시간 도달! 알람을 울립니다.")
-                trigger_alarm()
-                self.running = False # 알람 울렸으므로 종료
 
             elapsed_time = time.monotonic() - loop_start_time
             sleep_duration = 30 - elapsed_time
