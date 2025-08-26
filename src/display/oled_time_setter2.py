@@ -72,12 +72,14 @@ class OLEDTimeSetter:
         # Load fonts
         try:
             self.time_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
-            self.ampm_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
-            self.window_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 15)
+            self.ampm_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 13)
+            self.window_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 18)
+            self.alarmtime_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 10)
         except IOError:
             self.time_font = ImageFont.load_default()
             self.ampm_font = ImageFont.load_default()
             self.window_font = ImageFont.load_default()
+            self.alarmtime_font = ImageFont.load_default()
         
         # System state
         self.running = True
@@ -159,16 +161,16 @@ class OLEDTimeSetter:
         
         bbox = self.draw.textbbox((0, 0), time_text, font=self.time_font)
         time_x = (128 - (bbox[2] - bbox[0])) // 2
-        self.draw.text((time_x, 18), time_text, font=self.time_font, fill=255)
+        self.draw.text((time_x, 15), time_text, font=self.time_font, fill=255)
         
         ampm_bbox = self.draw.textbbox((0, 0), ampm_text, font=self.ampm_font)
         ampm_x = (128 - (ampm_bbox[2] - ampm_bbox[0])) // 2
-        self.draw.text((ampm_x, 43), ampm_text, font=self.ampm_font, fill=255)
+        self.draw.text((ampm_x, 40), ampm_text, font=self.ampm_font, fill=255)
         
         window_info = f"{self.wake_window_minutes}m before"
         window_bbox = self.draw.textbbox((0, 0), window_info, font=self.ampm_font)
         window_x = (128 - (window_bbox[2] - window_bbox[0])) // 2
-        self.draw.text((window_x, 54), window_info, font=self.ampm_font, fill=255)
+        self.draw.text((window_x, 50), window_info, font=self.ampm_font, fill=255)
     
     def draw_clock_interface(self):
         """Draw the clock interface showing current time and alarm time"""
@@ -184,24 +186,22 @@ class OLEDTimeSetter:
         
         bbox = self.draw.textbbox((0, 0), current_time_text, font=self.time_font)
         time_x = (128 - (bbox[2] - bbox[0])) // 2
-        self.draw.text((time_x, 18), current_time_text, font=self.time_font, fill=255)
+        self.draw.text((time_x, 15), current_time_text, font=self.time_font, fill=255)
         
         ampm_bbox = self.draw.textbbox((0, 0), current_ampm, font=self.ampm_font)
         ampm_x = (128 - (ampm_bbox[2] - ampm_bbox[0])) // 2
-        self.draw.text((ampm_x, 43), current_ampm, font=self.ampm_font, fill=255)
+        self.draw.text((ampm_x, 40), current_ampm, font=self.ampm_font, fill=255)
         
         alarm_dt = datetime.datetime.fromtimestamp(self.settime + TIMEGAP)
         alarm_hour = alarm_dt.hour
         
         display_alarm_hour = alarm_hour
-        if display_alarm_hour == 0: display_alarm_hour = 12
-        elif display_alarm_hour > 12: display_alarm_hour -= 12
 
         alarm_text = f"{display_alarm_hour:02d}:{alarm_dt.minute:02d}"
         alarm_bbox = self.draw.textbbox((0, 0), alarm_text, font=self.ampm_font)
         alarm_x = 128 - (alarm_bbox[2] - alarm_bbox[0]) - 2
         
-        self.draw.text((alarm_x, 48), alarm_text, font=self.ampm_font, fill=255)
+        self.draw.text((alarm_x, 48), alarm_text, font=self.alarmtime_font, fill=255)
 
     def adjust_window(self, increment):
         """Adjust wake window by increment"""
