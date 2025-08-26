@@ -9,7 +9,6 @@ import threading
 from typing import Optional
 from pytz import timezone
 import numpy as np
-from src.display.oled_time_setter2 import OledTimeSetter
 
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'processing'))
