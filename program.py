@@ -9,7 +9,7 @@ import os
 import sys
 from pytz import timezone
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, 'models/final_model.joblib')
+MODEL_PATH = os.path.join(BASE_DIR, 'models/final_modelwsp.joblib')
 
 
 system = OLEDTimeSetter()
