@@ -199,20 +199,18 @@ class OLEDTimeSetter:
         ampm_x = (128 - (ampm_bbox[2] - ampm_bbox[0])) // 2
         self.draw.text((ampm_x, 43), current_ampm, font=self.ampm_font, fill=255)
         
-        if self.set_time_fixed:
-            alarm_dt = datetime.datetime.fromtimestamp(self.settime + TIMEGAP)
-            alarm_hour = alarm_dt.hour
-            
-            display_alarm_hour = alarm_hour
-            if display_alarm_hour == 0: display_alarm_hour = 12
-            elif display_alarm_hour > 12: display_alarm_hour -= 12
+        alarm_dt = datetime.datetime.fromtimestamp(self.settime + TIMEGAP)
+        alarm_hour = alarm_dt.hour
+        
+        display_alarm_hour = alarm_hour
+        if display_alarm_hour == 0: display_alarm_hour = 12
+        elif display_alarm_hour > 12: display_alarm_hour -= 12
 
-            alarm_text = f"{display_alarm_hour:02d}:{alarm_dt.minute:02d}"
-            alarm_bbox = self.draw.textbbox((0, 0), alarm_text, font=self.ampm_font)
-            alarm_x = 128 - (alarm_bbox[2] - alarm_bbox[0]) - 2
-            
-            self.draw.text((alarm_x, 54), alarm_text, font=self.ampm_font, fill=255)
-            self.draw.text((alarm_x - 12, 54), "⏰", font=self.ampm_font, fill=255)
+        alarm_text = f"{display_alarm_hour:02d}:{alarm_dt.minute:02d}"
+        alarm_bbox = self.draw.textbbox((0, 0), alarm_text, font=self.ampm_font)
+        alarm_x = 128 - (alarm_bbox[2] - alarm_bbox[0]) - 2
+        
+        self.draw.text((alarm_x, 48), alarm_text, font=self.ampm_font, fill=255)
 
     def adjust_window(self, increment):
         """Adjust wake window by increment"""
@@ -263,18 +261,6 @@ class OLEDTimeSetter:
         
         print("✅ Smart alarm fully configured!")
         print(f"✅ Monitoring will start {self.wake_window_minutes} minutes before wake time")
-        
-    def handle_gpioreset(self):
-        while self.running:
-            try:
-                reset_state = GPIO.input(self.reset_pin)
-                if self.last_reset_state == 1 and reset_state == 0:
-                    self.reset_to_window_selection()
-                self.last_reset_state = reset_state
-                time.sleep(0.001)
-            except Exception as e:
-                print(f"GPIO error: {e}")
-                time.sleep(0.01)
 
     def handle_gpio(self):
         """Handle GPIO inputs in a separate thread"""
