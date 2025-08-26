@@ -66,6 +66,19 @@ class SmartAlarm:
         self.eeg_reader = EEGReader(port=self.args.port, baudrate=self.args.baudrate)
         self.thread: Optional[threading.Thread] = None
         self.running = False
+
+    def wait_until_start(self):
+        # 표기는 사용자 설정 시각인 UTC+9으로
+        print(f"brainalarm 시작 예정 시각: {self.start_time.strftime('%H:%M:%S')}")
+        print('start_datetime: ', self.start_time)
+        print('현재시각: ',datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S'))
+        while datetime.datetime.now(timezone('Asia/Seoul')) < self.start_time:
+            gpio_thread = threading.Thread(target=self.oled.handle_gpioreset, daemon=True)
+            gpio_thread.start()
+            print('waiting until start time...', end='\r')
+            self.oled.interface_mode = 'CLOCK'
+            self.oled.update_display()
+            time.sleep(5)
     
 
     def start(self):
@@ -106,7 +119,7 @@ class SmartAlarm:
         """(스레드에서 실행됨) 스마트 알람 메인 로직."""
         # 목표 기상 시간이 되면 무조건 알람 울림
 
-        wait_until_start(self, self.start_time)
+        wait_until_start(self)
         print('alarm loop started')
         eeg_started = False # EEG 리더가 시작되었는지 확인하는 플래그
 
