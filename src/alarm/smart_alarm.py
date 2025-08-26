@@ -110,7 +110,7 @@ class SmartAlarm:
             now_time = datetime.datetime.now(timezone('Asia/Seoul'))
             self.oled.draw.rectangle((0, 0, 128, 64), outline=0, fill=0)
             self.oled.draw_clock_interface()
-            self.oled.image(self.image)
+            self.oled.image(self.oled.image)
             self.oled.show()
                 
 
