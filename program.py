@@ -11,8 +11,8 @@ from pytz import timezone
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, 'models/final_modelwsp.joblib')
 
-
-system = OLEDTimeSetter()
+temp = datetime.datetime.now(timezone('Asia/Seoul'))
+system = OLEDTimeSetter(temp)
 system.run()
 
 # 사용자 설정
