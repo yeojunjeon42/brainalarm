@@ -73,7 +73,7 @@ class OLEDTimeSetter:
         try:
             self.time_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
             self.ampm_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
-            self.window_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 18)
+            self.window_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 15)
         except IOError:
             self.time_font = ImageFont.load_default()
             self.ampm_font = ImageFont.load_default()
@@ -149,32 +149,23 @@ class OLEDTimeSetter:
     def draw_time_interface(self):
         """Draw the time setting interface with blinking"""
         current_time = time.time()
-        if self.blink_state:
-            if current_time - self.last_blink_time >= 1.9:
-                self.blink_state = False
-                self.last_blink_time = current_time
-        else:
-            if current_time - self.last_blink_time >= 0.1:
-                self.blink_state = True
-                self.last_blink_time = current_time
         
-        if not self.time_is_blinking or self.blink_state:
-            display_hour = self.set_hour
-            if display_hour == 0: display_hour = 12
-            elif display_hour > 12: display_hour -= 12
+        display_hour = self.set_hour
+        if display_hour == 0: display_hour = 12
+        elif display_hour > 12: display_hour -= 12
+    
+        time_text = f"{display_hour:02d}:{self.set_minute:02d}"
+        ampm_text = "PM" if self.set_is_pm else "AM"
         
-            time_text = f"{display_hour:02d}:{self.set_minute:02d}"
-            ampm_text = "PM" if self.set_is_pm else "AM"
-            
-            bbox = self.draw.textbbox((0, 0), time_text, font=self.time_font)
-            time_x = (128 - (bbox[2] - bbox[0])) // 2
-            self.draw.text((time_x, 18), time_text, font=self.time_font, fill=255)
-            
-            ampm_bbox = self.draw.textbbox((0, 0), ampm_text, font=self.ampm_font)
-            ampm_x = (128 - (ampm_bbox[2] - ampm_bbox[0])) // 2
-            self.draw.text((ampm_x, 43), ampm_text, font=self.ampm_font, fill=255)
+        bbox = self.draw.textbbox((0, 0), time_text, font=self.time_font)
+        time_x = (128 - (bbox[2] - bbox[0])) // 2
+        self.draw.text((time_x, 18), time_text, font=self.time_font, fill=255)
         
-        window_info = f"{self.wake_window_minutes}min before"
+        ampm_bbox = self.draw.textbbox((0, 0), ampm_text, font=self.ampm_font)
+        ampm_x = (128 - (ampm_bbox[2] - ampm_bbox[0])) // 2
+        self.draw.text((ampm_x, 43), ampm_text, font=self.ampm_font, fill=255)
+        
+        window_info = f"{self.wake_window_minutes}m before"
         window_bbox = self.draw.textbbox((0, 0), window_info, font=self.ampm_font)
         window_x = (128 - (window_bbox[2] - window_bbox[0])) // 2
         self.draw.text((window_x, 54), window_info, font=self.ampm_font, fill=255)
