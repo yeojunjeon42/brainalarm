@@ -25,15 +25,7 @@ def trigger_alarm():
     """
     trigger_vibration_alarm(vibrate_duration=1.0, pause_duration=0.2)
 
-# wake window 내에 있는지 확인
-#def  is_within_wake_window(datetime.datetime, datetime.time, int)
-#wake_time은 current_time과 비교하여 알맞는 년, 월, 일, 시간, 분, 초에 설정되어야함
-# def is_within_wake_window(current_time, wake_time, window_min=15):
-#     current_time_timestamp = current_time.timestamp()
-#     wake_time_timestamp = wake_time.timestamp()
-#     if current_time_timestamp <= wake_time_timestamp and current_time_timestamp >= wake_time_timestamp + window_min*60:
-#         return True
-#     return False
+
 def is_within_wake_window(current_time, start_time, window_min=15):
     print('is_within_wake_window --- running')
     current_time_timestamp = current_time.timestamp()
@@ -115,8 +107,11 @@ class SmartAlarm:
 
         while self.running:
             loop_start_time = time.monotonic()
-            now_time = datetime.datetime.now(timezone('Asia/Seoul')) 
+            now_time = datetime.datetime.now(timezone('Asia/Seoul'))
+            self.draw.rectangle((0, 0, 128, 64), outline=0, fill=0)
             self.oled.draw_clock_interface()
+            self.oled.image(self.image)
+            self.oled.show()
                 
 
             # 4. 기상 윈도우에 진입했는지 확인
