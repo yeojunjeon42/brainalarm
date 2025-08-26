@@ -40,18 +40,18 @@ def is_within_wake_window(current_time, start_time, window_min=15):
 
 
 
-# 대기 함수
-# def wait_until_start(start_datetime : datetime.datetime, UTC+9로 입력됨)
-def wait_until_start(self, start_datetime):
-    # 표기는 사용자 설정 시각인 UTC+9으로
-    print(f"brainalarm 시작 예정 시각: {start_datetime.strftime('%H:%M:%S')}")
-    print('start_datetime: ', start_datetime)
-    print('현재시각: ',datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S'))
-    while datetime.datetime.now(timezone('Asia/Seoul')) < start_datetime:
-        print('waiting until start time...', end='\r')
-        self.oled.interface_mode = 'CLOCK'
-        self.oled.update_display()
-        time.sleep(5)
+# # 대기 함수
+# # def wait_until_start(start_datetime : datetime.datetime, UTC+9로 입력됨)
+# def wait_until_start(self, start_datetime):
+#     # 표기는 사용자 설정 시각인 UTC+9으로
+#     print(f"brainalarm 시작 예정 시각: {start_datetime.strftime('%H:%M:%S')}")
+#     print('start_datetime: ', start_datetime)
+#     print('현재시각: ',datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S'))
+#     while datetime.datetime.now(timezone('Asia/Seoul')) < start_datetime:
+#         print('waiting until start time...', end='\r')
+#         self.oled.interface_mode = 'CLOCK'
+#         self.oled.update_display()
+#         time.sleep(5)
 
 class SmartAlarm:
     def __init__(self, model, start_time, wake_time, wake_window_min, args, oled):
