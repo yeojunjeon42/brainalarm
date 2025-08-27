@@ -287,7 +287,7 @@ class OLEDTimeSetter:
         try:
             reset_state = GPIO.input(self.reset_pin)
             if self.last_reset_state == 1 and reset_state == 0:
-                self.reset_to_window_selection()
+                return 1
             self.last_reset_state = reset_state
             
             time.sleep(0.001)

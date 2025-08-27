@@ -73,8 +73,8 @@ class SmartAlarm:
         print('start_datetime: ', self.start_time)
         print('현재시각: ',datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S'))
         while datetime.datetime.now(timezone('Asia/Seoul')) < self.start_time:
-            gpio_thread = threading.Thread(target=self.oled.handle_gpioreset, daemon=True)
-            gpio_thread.start()
+            # gpio_thread = threading.Thread(target=self.oled.handle_gpioreset, daemon=True)
+            # gpio_thread.start()
             print('waiting until start time...', end='\r')
             self.oled.interface_mode = 'CLOCK'
             self.oled.update_display()
