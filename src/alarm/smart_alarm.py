@@ -90,6 +90,7 @@ class SmartAlarm:
         # 2. _alarm_loop 스레드만 시작합니다.
         self.thread = threading.Thread(target=self._alarm_loop, daemon=True)
         self.thread.start()
+        self.running = True
         print("Smart alarm thread started. Waiting for wake window...")
 
     def stop(self):
