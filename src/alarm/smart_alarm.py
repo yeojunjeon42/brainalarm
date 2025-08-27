@@ -87,7 +87,6 @@ class SmartAlarm:
             print("Alarm is already running.")
             return
 
-        self.running = True
         # 2. _alarm_loop 스레드만 시작합니다.
         self.thread = threading.Thread(target=self._alarm_loop, daemon=True)
         self.thread.start()
@@ -153,7 +152,7 @@ class SmartAlarm:
                 if eeg_started:
                     if self.eeg_reader.new_feature_ready:
                         print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}]New EEG feature available for prediction.")
-                        if self.eeg_reader.signal_quality > self.eeg_reader.noise_threshold:
+                        if self.eeg_reader.signal_quality < self.eeg_reader.noise_threshold:
                             print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 신호 품질이 좋지 않습니다 ({self.eeg_reader.signal_quality}%). 다시 시도합니다.")
                         else:
                             feature_vector = np.array(self.eeg_reader.feature)

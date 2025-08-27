@@ -284,17 +284,16 @@ class OLEDTimeSetter:
                 time.sleep(0.01)
     def handle_gpioreset(self):
         """Handle GPIO reset button in a separate thread"""
-        while self.running:
-            try:
-                reset_state = GPIO.input(self.reset_pin)
-                if self.last_reset_state == 1 and reset_state == 0:
-                    self.reset_to_window_selection()
-                self.last_reset_state = reset_state
-                
-                time.sleep(0.001)
-            except Exception as e:
-                print(f"GPIO error: {e}")
-                time.sleep(0.01)
+        try:
+            reset_state = GPIO.input(self.reset_pin)
+            if self.last_reset_state == 1 and reset_state == 0:
+                self.reset_to_window_selection()
+            self.last_reset_state = reset_state
+            
+            time.sleep(0.001)
+        except Exception as e:
+            print(f"GPIO error: {e}")
+            time.sleep(0.01)
     
     def run(self):
         """Main execution loop"""
