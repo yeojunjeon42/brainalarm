@@ -1,5 +1,7 @@
 import RPi.GPIO as GPIO
-
+GPIO.cleanup()
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
 reset_pin = 4
 GPIO.setup(reset_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 last_reset_state = GPIO.input(reset_pin)
