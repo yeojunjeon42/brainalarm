@@ -198,6 +198,21 @@ class ThinkGearParser:
             else:
                 break
 
+class thirty_quality:
+    def __init__(self):
+        self.quality_list = None
+        self.buffer_size = 30
+        self.buffer = deque(maxlen = self.buffer_size)
+
+    def add_quality(self, quality):
+        self.buffer.append(quality)
+        has_thirty_seconds_quality = None
+        if len(self.buffer) == self.buffer_size:
+            self.quality_list = list(self.buffer)
+            self.buffer.clear()
+            all_is_zero = all(q==0 for q in self.quality_list)
+        return (all_is_zero, has_thirty_seconds_quality)
+
 class EpochFeatureExtractor:
     def __init__(self, fs=512, epoch_duration=30):
         """
@@ -239,8 +254,8 @@ class EEGReader:
         self.feature_extractor = EpochFeatureExtractor(fs=512, epoch_duration=30)
         self.feature = None
         self.thread: Optional[threading.Thread] = None
-        self.signal_quality = 0
-        self.noise_threshold = 50  # 신호 품질 임계값 (예: 50 이상은 노이즈 많음)
+        self.thirty_signal_quality = None
+        self.thirty_quality_checker = thirty_quality()
         self.new_feature_ready = False
         
     def connect(self) -> bool:
@@ -277,9 +292,12 @@ class EEGReader:
         timestamp = time.strftime("%H:%M:%S")
         
         if code == CODE_POOR_SIGNAL:
-            signal_quality = 100 - value[0] if isinstance(value, (bytes, bytearray)) else 100 - value
-            #print(f"[{timestamp}] Signal Quality: {signal_quality}%")
-            self.signal_quality = signal_quality
+            signal_quality = value[0] if isinstance(value, (bytes, bytearray)) else value
+            is_good, is_ready = self.thirty_quality_checker.add_quality(signal_quality)
+            if is_ready:
+                self.thirty_signal_quality = is_good
+            #어차피 raw_value가 30*512 = 15360개 모이면 quality는 30개 모이니까
+            #0: best, 25/26/27/29 의 조합만 가능, 200: worst
             
         elif code == CODE_ATTENTION:
             attention = value[0] if isinstance(value, (bytes, bytearray)) else value

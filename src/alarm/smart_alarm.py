@@ -153,7 +153,7 @@ class SmartAlarm:
                 if eeg_started:
                     if self.eeg_reader.new_feature_ready:
                         print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}]New EEG feature available for prediction.")
-                        if self.eeg_reader.signal_quality < self.eeg_reader.noise_threshold:
+                        if self.eeg_reader.signal_quality != 0:
                             print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 신호 품질이 좋지 않습니다 ({self.eeg_reader.signal_quality}%). 다시 시도합니다.")
                         else:
                             feature_vector = np.array(self.eeg_reader.feature)
