@@ -130,9 +130,9 @@ class SmartAlarm:
             self.oled.update_display()
             if now_time > self.wake_time:
                 print(f"[{datetime.datetime.now(timezone('Asia/Seoul')).strftime('%H:%M:%S')}] 목표 기상 시간 도달! 알람을 울립니다.")
-                trigger_alarm()
                 self.running = False # 알람 울렸으므로 종료
                 self.eeg_reader.disconnect()
+                trigger_alarm()
                 
 
             # 4. 기상 윈도우에 진입했는지 확인
