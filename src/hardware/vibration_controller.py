@@ -171,6 +171,3 @@ if __name__ == "__main__":
     # Test the vibration controller
     print("Testing vibration controller...")
     trigger_vibration_alarm()
-
-test = VibrationController()
-test.start_alarm_vibration()
