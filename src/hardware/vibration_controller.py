@@ -8,6 +8,9 @@ Handles vibration motor control for the NeuroRise smart alarm system
 import time
 import RPi.GPIO as GPIO
 
+test = VibrationController()
+test.start_alarm_vibration()
+
 class VibrationController:
     def __init__(self, vibration_pin=27, reset_pin=4):
         """
