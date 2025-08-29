@@ -12,9 +12,7 @@ from pytz import timezone
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, 'models/final_modelwsp.joblib')
 
-controller = VibrationController()
-controller.setup_gpio()
-controller.start_alarm_vibration(1,0.2)
+
 temp = datetime.datetime.now(timezone('Asia/Seoul'))
 system = OLEDTimeSetter(temp)
 system.run()
