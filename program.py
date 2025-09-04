@@ -10,7 +10,7 @@ import sys
 from src.hardware.vibration_controller import VibrationController
 from pytz import timezone
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, 'models/final_modelwsp.joblib')
+MODEL_PATH = os.path.join(BASE_DIR, 'models/sleep_stage_classifier.joblib')
 
 
 temp = datetime.datetime.now(timezone('Asia/Seoul'))
@@ -37,8 +37,8 @@ if system.set_time_fixed:
     wake_window_min = system.wake_window_minutes  # 예정 시각 -wake_window_min만큼에서 N2 수면 단계 감지 시 알람 작동
     start_time = wake_time - datetime.timedelta(minutes= wake_window_min)
     parser = argparse.ArgumentParser(description='EEG Data Reader for ThinkGear Protocol')
-    parser.add_argument('--port', '-p', default='/dev/serial0', 
-                    help='Serial port (default: /dev/serial0)')
+    parser.add_argument('--port', '-p', default='/dev/rfcomm0', 
+                    help='Serial port (default: /dev/rfcomm0)')
     parser.add_argument('--baudrate', '-b', type=int, default=57600,
                     help='Baud rate (default: 57600)')
     parser.add_argument('--mode', '-m', choices=['hex', 'monitor'], default='hex',
