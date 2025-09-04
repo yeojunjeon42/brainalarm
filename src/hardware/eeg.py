@@ -245,7 +245,7 @@ class EpochFeatureExtractor:
 class EEGReader:
     """EEG Data Reader with hex display functionality"""
     
-    def __init__(self, port: str = '/dev/ttyUSB0', baudrate: int = 57600):
+    def __init__(self, port: str = '/dev/rfcomm0', baudrate: int = 57600):
         self.port = port
         self.baudrate = baudrate
         self.serial_conn: Optional[serial.Serial] = None

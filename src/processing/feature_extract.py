@@ -7,10 +7,12 @@ alpha = [9,11]
 sigma = [12,15]
 beta1 = [14,20]
 beta2 = [20,30]
+beta = [14,30]
 gamma1 = [30,40]
 gamma2 = [40,49.5]
+gamma = [30,49.5]
 Kcomplex = [0.5,1]
-bands = [delta,theta,alpha,sigma,beta1,beta2,gamma1,gamma2,Kcomplex]
+bands = [delta,theta,alpha,sigma,beta,gamma,Kcomplex]
 
 def exfeature(data,fs=512):
     features = []
