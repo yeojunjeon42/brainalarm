@@ -208,7 +208,7 @@ class thirty_quality:
     def add_quality(self, quality):
         self.buffer.append(quality)
         has_thirty_seconds_quality = None
-        all_is_zero = None
+        all_is_zero = 0
         if len(self.buffer) == self.buffer_size:
             has_thirty_seconds_quality = True
             self.quality_list = list(self.buffer)
