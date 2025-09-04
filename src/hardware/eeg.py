@@ -199,22 +199,30 @@ class ThinkGearParser:
                 break
 
 class thirty_quality:
+    """30초 슬라이딩 윈도우를 사용하여 신호 품질을 지속적으로 모니터링합니다."""
     def __init__(self):
-        self.quality_list = None
         self.buffer_size = 30
-        self.buffer = deque(maxlen = self.buffer_size)
+        # maxlen을 사용하는 deque는 자동으로 가장 오래된 데이터를 밀어내
+        # 완벽한 슬라이딩 윈도우를 구현합니다.
+        self.buffer = deque(maxlen=self.buffer_size)
+        self.is_good = False  # 가장 최근에 확인된 '좋음' 상태를 저장
 
-    #0: best, 25/26/27/29 의 조합만 가능, 200: worst
-    def add_quality(self, quality):
+    def add_and_check(self, quality: int) -> bool:
+        """
+        새로운 품질 값을 추가하고, 버퍼가 가득 찼을 때만 품질을 검사합니다.
+        
+        Returns:
+            bool: 품질 검사를 새로 수행했는지 여부를 반환합니다.
+        """
         self.buffer.append(quality)
-        has_thirty_seconds_quality = None
-        all_is_zero = 0
+        
+        # 버퍼가 30개 샘플로 가득 찼는지 확인
         if len(self.buffer) == self.buffer_size:
-            has_thirty_seconds_quality = True
-            self.quality_list = list(self.buffer)
-            self.buffer.clear()
-            all_is_zero = all(q==0 for q in self.quality_list)
-        return (all_is_zero, has_thirty_seconds_quality)
+            # 버퍼 내의 모든 값이 0(좋음)인지 확인하여 상태 업데이트
+            self.is_good = all(q == 0 for q in self.buffer)
+            return True  # 새로운 검사가 완료되었음을 알림
+            
+        return False # 버퍼가 아직 채워지지 않음
 
 class EpochFeatureExtractor:
     def __init__(self, fs=512, epoch_duration=30):
@@ -296,9 +304,10 @@ class EEGReader:
         
         if code == CODE_POOR_SIGNAL:
             signal_quality = value[0] if isinstance(value, (bytes, bytearray)) else value
-            is_good, is_ready = self.thirty_quality_checker.add_quality(signal_quality)
-            if is_ready:
-                self.thirty_signal_quality = is_good
+            is_check_done = self.thirty_quality_checker.add_and_check(signal_quality)
+            if is_check_done:
+                self.thirty_signal_quality = self.thirty_quality_checker.is_good
+                print(f"[{timestamp}] 30초 신호 품질 재확인: {'좋음' if self.thirty_signal_quality else '불안정'}")
             
         elif code == CODE_ATTENTION:
             attention = value[0] if isinstance(value, (bytes, bytearray)) else value
