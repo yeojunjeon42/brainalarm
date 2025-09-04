@@ -204,10 +204,13 @@ class thirty_quality:
         self.buffer_size = 30
         self.buffer = deque(maxlen = self.buffer_size)
 
+    #0: best, 25/26/27/29 의 조합만 가능, 200: worst
     def add_quality(self, quality):
         self.buffer.append(quality)
         has_thirty_seconds_quality = None
+        all_is_zero = None
         if len(self.buffer) == self.buffer_size:
+            has_thirty_seconds_quality = True
             self.quality_list = list(self.buffer)
             self.buffer.clear()
             all_is_zero = all(q==0 for q in self.quality_list)
@@ -296,8 +299,6 @@ class EEGReader:
             is_good, is_ready = self.thirty_quality_checker.add_quality(signal_quality)
             if is_ready:
                 self.thirty_signal_quality = is_good
-            #어차피 raw_value가 30*512 = 15360개 모이면 quality는 30개 모이니까
-            #0: best, 25/26/27/29 의 조합만 가능, 200: worst
             
         elif code == CODE_ATTENTION:
             attention = value[0] if isinstance(value, (bytes, bytearray)) else value
