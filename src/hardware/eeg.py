@@ -325,6 +325,9 @@ class EEGReader:
                 self.feature = new_feature
                 self.new_feature_ready = True
                 #print(f"[{timestamp}] New 30s epoch feature extracted.")
+        
+        elif code == 0x83: # EEG Power (각 뇌파 대역별 세기)
+            pass
             
             
         else:
