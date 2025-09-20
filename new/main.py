@@ -1,6 +1,6 @@
 # main.py
 from state_manager import StateManager
-from hardware_handler import oled, set_button, reset_button, rotary_encoder, vibrator
+from hardware_handler import oled, set_button, reset_button, rotary_encoder, buzzer
 from eeg_handler import EEGReader
 import time
 import os
@@ -35,5 +35,5 @@ try:
 
 finally:
     eeg_processor.stop()
-    vibrator.stop()
+    buzzer.stop()
     print("프로그램 종료")

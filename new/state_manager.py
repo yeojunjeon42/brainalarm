@@ -24,7 +24,7 @@ class StateManager:
             if set_pressed:
                 self.current_state = State.SET_WAKE_WINDOW
         
-        elif self.current_state == State.SET_WAKE_WINDOW:
+        elif self.current_state == State.SET_WAKE_WINDOW: # +5 minutes
             # 로터리 엔코더 값으로 wake_window 조절
             self.wake_window += encoder_change*5
             self.wake_window = min(max(self.wake_window, 5), 90) # 5~60분 사이로 제한
@@ -48,11 +48,11 @@ class StateManager:
         is_target_time = (now >= self.target_wake_time)
 
         if (is_in_window and sleep_stage == "N2") or is_target_time:
-            vibrator.start()
+            buzzer.start()
         
         # 알람 중지 조건 (예: 아무 버튼이나 누르면 중지)
-        if (set_pressed or reset_pressed) and vibrator.is_active():
-            vibrator.stop()
+        if (set_pressed or reset_pressed) and buzzer.is_active():
+            buzzer.stop()
 
     def _reset_all(self):
         # 모든 설정 변수를 기본값으로 초기화
