@@ -15,12 +15,12 @@ class EditMode(Enum):
 
 class StateManager:
     """시계의 상태와 로직을 총괄하는 클래스"""
-    def __init__(self, vibrator):
+    def __init__(self, Buzzer):
         """
         StateManager를 초기화합니다.
         - vibrator: 진동 모터 제어 객체를 외부에서 주입받습니다.
         """
-        self.vibrator = vibrator
+        self.buzzer = Buzzer
         self._reset()
 
     def _reset(self):
@@ -117,7 +117,7 @@ class StateManager:
 
     def stop_alarm(self):
         """알람을 중지하고 관련 상태를 리셋합니다."""
-        if self.vibrator.is_active():
-            self.vibrator.stop()
+        if self.buzzer.is_active():
+            self.buzzer.stop()
         self.alarm_active = False
         print("알람 중지됨.")

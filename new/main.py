@@ -8,7 +8,7 @@ from state_manager import StateManager
 
 # --- 필요한 모듈 임포트 ---
 # 각 파일에 실제 하드웨어 제어 클래스가 구현되어 있어야 합니다.
-from hardware_handler import Vibrator, Button, RotaryEncoder, OLED
+from hardware_handler import Buzzer, Button, RotaryEncoder, OLED
 from eeg_handler import EEGReader
 from ui_renderer import UIRenderer
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -28,14 +28,14 @@ def main():
     ENCODER_DT_PIN = 18
 
     # 각 모듈의 객체를 생성합니다.
-    vibrator = Vibrator(VIBRATOR_PIN)
+    buzzer = Buzzer(VIBRATOR_PIN)
     set_button = Button(SET_BUTTON_PIN)
     reset_button = Button(RESET_BUTTON_PIN)
     rotary_encoder = RotaryEncoder(ENCODER_CLK_PIN, ENCODER_DT_PIN)
     oled = OLED()
     
     # StateManager에 vibrator 객체를 전달하여 의존성을 주입합니다.
-    state_manager = StateManager(vibrator)
+    state_manager = StateManager(buzzer)
     
     # EEG 분석기와 UI 렌더러 객체도 생성합니다.
     eeg_processor = EEGReader(sleep_stage_model)
@@ -96,7 +96,7 @@ def main():
                     print("알람 조건 충족! 진동을 시작합니다.")
                     # EEG 스레드는 이미 실행 중이므로, 중지하기만 하면 됩니다.
                     eeg_processor.stop_collection()
-                    vibrator.start()
+                    buzzer.start()
             
             # --- 2.4. 화면 출력 (Output Rendering) ---
             # 현재 상태에 맞는 화면을 그려달라고 Renderer에게 요청합니다.
@@ -114,7 +114,7 @@ def main():
         # 프로그램이 어떤 이유로든 종료될 때 항상 실행됩니다.
         if eeg_processor.running(): # EEG 스레드가 여전히 실행 중이면 종료
             eeg_processor.stop_collection()
-        vibrator.stop()
+        buzzer.stop()
         GPIO.cleanup() # 모든 GPIO 설정을 깨끗하게 초기화합니다.
 
 if __name__ == "__main__":
