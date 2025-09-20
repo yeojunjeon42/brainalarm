@@ -24,8 +24,8 @@ class OLED:
     # Methods will be called by state_manager.render()
     # Add other display methods as needed
 
-class Button(self,pin):
-    def __init__(self):
+class Button:
+    def __init__(self, pin):
         self.pin = pin
         self.last_state = GPIO.input(self.pin) #default state is high
     
