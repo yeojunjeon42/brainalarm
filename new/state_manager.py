@@ -1,68 +1,123 @@
 # state_manager.py
-from enum import Enum
+from enum import Enum, auto
 from datetime import datetime, time, timedelta
 
 class State(Enum):
-    DISPLAY_TIME = 1
-    SET_WAKE_WINDOW = 2
-    SET_TARGET_TIME = 3
+    """시계의 현재 상태를 나타냅니다."""
+    DISPLAY_TIME = auto()
+    SET_WINDOW_DURATION = auto()
+    SET_TARGET_TIME = auto()
+
+class EditMode(Enum):
+    """시간 설정 시 '시' 또는 '분'을 편집 중인지 나타냅니다."""
+    HOUR = auto()
+    MINUTE = auto()
 
 class StateManager:
-    def __init__(self):
-        self.current_state = State.DISPLAY_TIME
-        self.wake_window = 30 # in minutes
-        self.target_wake_time = time(7, 0)
-        # ... 기타 설정 변수들
+    """시계의 상태와 로직을 총괄하는 클래스"""
+    def __init__(self, vibrator):
+        """
+        StateManager를 초기화합니다.
+        - vibrator: 진동 모터 제어 객체를 외부에서 주입받습니다.
+        """
+        self.vibrator = vibrator
+        self._reset()
 
-    def update(self, set_pressed, reset_pressed, encoder_change, sleep_stage):
-        if reset_pressed:
-            self._reset_all()
+    def _reset(self):
+        """모든 상태와 설정값을 기본값으로 초기화합니다."""
+        self.current_state = State.DISPLAY_TIME
+        self.edit_mode = EditMode.HOUR
+
+        # 최종 저장될 설정값
+        self.window_duration_minutes = 30  # 기상 창 크기 (기본값: 30분)
+        self.target_time = time(7, 0)      # 최종 기상 시간 (기본값: 오전 7시)
+
+        # 사용자가 편집 중인 값을 임시로 저장하는 변수
+        self.temp_window_duration_minutes = self.window_duration_minutes
+        self.temp_target_time = self.target_time
+        
+        # 알람이 활성화되었는지 나타내는 플래그
+        self.alarm_active = False
+        print("모든 설정이 초기화되었습니다.")
+
+    def handle_set_press(self):
+        """'Set' 버튼 입력을 처리하여 상태를 전환합니다."""
+        # 알람이 울리는 중에는 설정 모드로 진입하지 않습니다.
+        if self.alarm_active:
             return
 
-        # 현재 상태에 따라 입력 처리
         if self.current_state == State.DISPLAY_TIME:
-            if set_pressed:
-                self.current_state = State.SET_WAKE_WINDOW
+            self.current_state = State.SET_WINDOW_DURATION
+            return
+
+        if self.current_state == State.SET_WINDOW_DURATION:
+            self.window_duration_minutes = self.temp_window_duration_minutes
+            self.current_state = State.SET_TARGET_TIME
+            self.edit_mode = EditMode.HOUR
+            return
+
+        if self.current_state == State.SET_TARGET_TIME:
+            if self.edit_mode == EditMode.HOUR:
+                self.edit_mode = EditMode.MINUTE
+            else: # '분' 편집 모드였을 경우
+                self.target_time = self.temp_target_time
+                self.current_state = State.DISPLAY_TIME
+                self.edit_mode = EditMode.HOUR
+
+    def handle_reset_press(self):
+        """'Reset' 버튼 입력을 처리합니다."""
+        # 알람이 울리는 중에 눌렸다면, 먼저 알람을 끕니다.
+        if self.alarm_active:
+            self.stop_alarm()
         
-        elif self.current_state == State.SET_WAKE_WINDOW:
-            # 로터리 엔코더 값으로 wake_window 조절
-            self.wake_window += encoder_change*5
-            self.wake_window = min(max(self.wake_window, 5), 90) # 5~60분 사이로 제한
-            if set_pressed:
-                self.current_state = State.SET_TARGET_TIME
+        # 모든 설정을 초기화합니다.
+        self._reset()
+
+    def handle_rotation(self, change):
+        """로터리 엔코더 입력을 처리하여 임시 설정값을 조절합니다."""
+        if self.current_state == State.SET_WINDOW_DURATION:
+            self.temp_window_duration_minutes += change
+            # 값이 비정상적으로 커지거나 작아지는 것을 방지
+            if self.temp_window_duration_minutes < 5: self.temp_window_duration_minutes = 5
+            if self.temp_window_duration_minutes > 90: self.temp_window_duration_minutes = 90
 
         elif self.current_state == State.SET_TARGET_TIME:
-            # 로터리 엔코더 값으로 target_wake_time 조절
-            total_minutes = self.target_wake_time.hour * 60 + self.target_wake_time.minute + encoder_change*5
-            total_minutes = total_minutes % (24 * 60) # 24시간 형식
-            self.target_wake_time = time(total_minutes // 60, total_minutes % 60)
-            if set_pressed:
-                self.current_state = State.DISPLAY_TIME
+            self.temp_target_time = self._adjust_time(self.temp_target_time, change)
 
-        # 알람 조건 확인 및 실행
-        self._check_alarm_condition(sleep_stage)
+    def _adjust_time(self, time_obj, change):
+        """편집 모드(시/분)에 따라 시간을 조절하는 헬퍼 함수입니다."""
+        dt = datetime.combine(datetime.today(), time_obj)
+        delta = timedelta(hours=change) if self.edit_mode == EditMode.HOUR else timedelta(minutes=change)
+        return (dt + delta).time()
 
-    def _check_alarm_condition(self, sleep_stage):
-        now = datetime.now().time()
-        is_in_window = (self.target_wake_time - self.wake_window <= now < self.target_wake_time)
-        is_target_time = (now >= self.target_wake_time)
+    def check_alarm_condition(self, sleep_stage):
+        """
+        알람 조건을 확인합니다. 조건 충족 시 True를 반환하여
+        main.py에 EEG 해제와 진동 시작을 알립니다.
+        """
+        if self.alarm_active:
+            return False
 
-        if (is_in_window and sleep_stage == "N2") or is_target_time:
-            vibrator.start()
-        
-        # 알람 중지 조건 (예: 아무 버튼이나 누르면 중지)
-        if (set_pressed or reset_pressed) and vibrator.is_active():
-            vibrator.stop()
+        now = datetime.now()
+        now_time = now.time()
 
-    def _reset_all(self):
-        # 모든 설정 변수를 기본값으로 초기화
-        self.current_state = State.DISPLAY_TIME
-        # ...
+        target_datetime = datetime.combine(now.date(), self.target_time)
+        window_start_datetime = target_datetime - timedelta(minutes=self.window_duration_minutes)
+        calculated_window_start_time = window_start_datetime.time()
 
-    def render(self, oled):
-        # 현재 상태에 맞는 UI를 OLED에 그림
-        if self.current_state == State.DISPLAY_TIME:
-            # 현재 시각, 설정된 알람 시간 등 표시
-        elif self.current_state == State.SET_WAKE_WINDOW:
-            # 기상 창 설정 UI 표시
-        elif self.current_state == State.SET_TARGET_TIME
+        is_in_window = calculated_window_start_time <= now_time < self.target_time
+        is_target_time = now_time >= self.target_time
+
+        # 조건 충족 시, 알람을 활성화하고 True를 반환하여 main.py에 알립니다.
+        if is_target_time or (is_in_window and sleep_stage == "N2"):
+            self.alarm_active = True
+            return True
+            
+        return False
+
+    def stop_alarm(self):
+        """알람을 중지하고 관련 상태를 리셋합니다."""
+        if self.vibrator.is_active():
+            self.vibrator.stop()
+        self.alarm_active = False
+        print("알람 중지됨.")
