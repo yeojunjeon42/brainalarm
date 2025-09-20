@@ -112,8 +112,8 @@ def main():
         # 3. 종료 단계 (Cleanup)
         # =================================================================
         # 프로그램이 어떤 이유로든 종료될 때 항상 실행됩니다.
-        if eeg_processor.is_running(): # EEG 스레드가 여전히 실행 중이면 종료
-            eeg_processor.stop()
+        if eeg_processor.running(): # EEG 스레드가 여전히 실행 중이면 종료
+            eeg_processor.stop_collection()
         vibrator.stop()
         GPIO.cleanup() # 모든 GPIO 설정을 깨끗하게 초기화합니다.
 
