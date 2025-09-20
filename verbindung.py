@@ -50,7 +50,7 @@ def parse_tgam_packet(packet):
                         raw_wave -= 65536
                     i += 2
                     # 원본 데이터는 매우 빠르게 출력되므로 필요할 때 주석을 해제하여 사용하세요.
-                    print(f"Raw Wave: {raw_wave}")
+                    # print(f"Raw Wave: {raw_wave}")
 
             elif code == 0x83: # EEG Power (각 뇌파 대역별 세기)
                 # 이 값들은 뇌파 분석에 중요하게 사용됩니다.
