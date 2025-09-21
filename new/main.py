@@ -72,7 +72,7 @@ def main():
 
             # 현재 시간이 wake_window 안에 있는지 확인합니다.
             is_in_window = window_start_time <= now_time < window_end_time
-            eeg_is_running = eeg_processor.running()
+            eeg_is_running = eeg_processor.is_running()
 
             # --- 스레드 시작 조건 ---
             # 창 안에 있고, 알람이 울리지 않으며, 스레드가 꺼져 있을 때
@@ -114,6 +114,7 @@ def main():
         # 프로그램이 어떤 이유로든 종료될 때 항상 실행됩니다.
         if eeg_processor.running(): # EEG 스레드가 여전히 실행 중이면 종료
             eeg_processor.stop_collection()
+        eeg_processor.disconnect()
         buzzer.stop()
         GPIO.cleanup() # 모든 GPIO 설정을 깨끗하게 초기화합니다.
 

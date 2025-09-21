@@ -200,6 +200,9 @@ class EEGReader:
         except queue.Empty:
             # 큐가 비어있을 때 (논블로킹 모드 또는 타임아웃) 발생하는 예외입니다.
             return None
+    def is_running(self) -> bool:
+        return self.thread and self.thread.is_alive()
+    """모니터링 스레드가 현재 활성 상태인지 확인합니다."""
 
 # --- Example Usage ---
 def main():
