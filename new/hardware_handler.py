@@ -4,6 +4,7 @@ from luma.core.interface.serial import i2c
 from luma.core.render import canvas
 from luma.oled.device import ssd1306
 from PIL import Image, ImageDraw, ImageFont
+import threading
 
 #set up pins
 BUZZER_PIN = 27
@@ -39,18 +40,37 @@ class RotaryEncoder:
     def __init__(self, clk_pin, dt_pin):
         self.clk_pin = clk_pin
         self.dt_pin = dt_pin
-        GPIO.setup(self.clk_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+        
+        # 스레드 충돌을 방지하기 위한 Lock 객체
+        self.lock = threading.Lock()
+        self.change_value = 0
+
+        # GPIO 핀 설정
+        GPIO.setup(self.clk_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.setup(self.dt_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        self.last_clk = GPIO.input(self.clk_pin)
-    
+        
+        # CLK 핀에 RISING(신호가 0->1이 될 때) 인터럽트 설정
+        # 변화가 감지되면 self._callback 함수가 실행됩니다.
+        GPIO.add_event_detect(self.clk_pin, GPIO.RISING, callback=self._callback, bouncetime=10)
+
+    def _callback(self, channel):
+        # 인터럽트 콜백 함수
+        # DT 핀의 상태를 읽어 방향을 결정합니다.
+        # 여러 신호가 동시에 접근하는 것을 막기 위해 lock을 사용합니다.
+        with self.lock:
+            dt_state = GPIO.input(self.dt_pin)
+            if dt_state == 0:
+                self.change_value += 1  # 정방향
+            else:
+                self.change_value -= 1  # 역방향
+
     def get_change(self):
-        clk_state = GPIO.input(self.clk_pin)  # Read current CLK pin state
-        change = 0
-        if self.last_clk == 0 and clk_state == 1:  # Detect rising edge on CLK
-            dt_state = GPIO.input(self.dt_pin)  # Read DT pin state
-            change = 1 if dt_state == 0 else -1  # Adjust by ±5
-        self.last_clk = clk_state  # Store current state for next iteration
-        return change
+        # main.py에서 호출하는 함수
+        # 인터럽트를 통해 누적된 값을 반환하고 초기화합니다.
+        with self.lock:
+            value = self.change_value
+            self.change_value = 0  # 값을 읽어간 후에는 0으로 리셋
+        return value
 
 class Buzzer:
     def __init__(self, pin, reset_pin):
