@@ -23,7 +23,7 @@ class UIRenderer:
         """
         # 1순위: 알람이 활성화되었는지 먼저 확인
         if state_manager.alarm_active:
-            self._draw_alarm_screen(draw, oled, state_manager)
+            self._draw_alarm_screen(draw, oled)
             return
 
         # 2순위: 현재 상태에 따라 다른 화면 호출
@@ -40,7 +40,7 @@ class UIRenderer:
         draw.text((15, 10), "WAKE UP!", font=oled._get_font('large'), fill="white")
         draw.text((40, 40), now_str, font=oled._get_font('small'), fill="white")
 
-    def _draw_display_time_screen(self, draw, state_manager, oled):
+    def _draw_display_time_screen(self, draw, oled, state_manager):
         now_str = datetime.now().strftime('%H:%M:%S')
         target_str = state_manager.target_time.strftime('%H:%M')
         duration = state_manager.window_duration_minutes
@@ -48,12 +48,12 @@ class UIRenderer:
         draw.text((25, 10), now_str, font=oled._get_font('large'), fill="white")
         draw.text((20, 40), f"Alarm: {target_str} ({duration}min)", font=oled._get_font('small'), fill="white")
 
-    def _draw_set_duration_screen(self, draw, state_manager, oled):
+    def _draw_set_duration_screen(self, draw, oled, state_manager):
         duration = state_manager.temp_window_duration_minutes
         draw.text((10, 10), "Set Window", font=oled._get_font('small'), fill="white")
         draw.text((25, 30), f"< {duration:02d} min >", font=oled._get_font('large'), fill="white")
 
-    def _draw_set_target_time_screen(self, draw, state_manager, oled):
+    def _draw_set_target_time_screen(self, draw, oled, state_manager):
         temp_time = state_manager.temp_target_time
         hour_str = f"{temp_time.hour:02d}"
         minute_str = f"{temp_time.minute:02d}"
