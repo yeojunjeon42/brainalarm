@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 
 # 문제가 발생하는 17번 핀을 테스트합니다.
-PIN = 17
+PIN = 26
 
 def my_callback(channel):
     print(f"성공! >> 인터럽트 감지됨: {channel}번 핀")
