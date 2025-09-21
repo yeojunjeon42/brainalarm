@@ -74,7 +74,7 @@ def main():
             now_time = datetime.now(timezone('Asia/Seoul')).time()
             
             # StateManager로부터 현재 설정된 wake_window 시간을 계산합니다.
-            target_dt = datetime.combine(datetime.today(timezone('Asia/Seoul')), state_manager.target_time)
+            target_dt = datetime.combine(datetime.today(), state_manager.target_time)
             window_start_dt = target_dt - timedelta(minutes=state_manager.window_duration_minutes)
             window_start_time = window_start_dt.time()
             window_end_time = state_manager.target_time
