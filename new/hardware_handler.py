@@ -51,9 +51,14 @@ class RotaryEncoder:
         
         # CLK 핀에 RISING(신호가 0->1이 될 때) 인터럽트 설정
         # 변화가 감지되면 self._callback 함수가 실행됩니다.
+        try:
+            GPIO.remove_event_detect(self.clk_pin)
+        except RuntimeError:
+            # 설정된 인터럽트가 없으면 오류가 발생하므로, 무시합니다.
+            pass
         GPIO.add_event_detect(self.clk_pin, GPIO.RISING, callback=self._callback, bouncetime=10)
 
-    def _callback(self, channel):
+    def _callback(self):
         # 인터럽트 콜백 함수
         # DT 핀의 상태를 읽어 방향을 결정합니다.
         # 여러 신호가 동시에 접근하는 것을 막기 위해 lock을 사용합니다.
