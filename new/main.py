@@ -28,7 +28,6 @@ def main():
     ENCODER_CLK_PIN = 17
     ENCODER_DT_PIN = 18
 
-    GPIO.cleanup()
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(BUZZER_PIN, GPIO.OUT)
     GPIO.setup(RESET_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
