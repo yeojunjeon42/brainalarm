@@ -180,7 +180,7 @@ class EEGReader:
             self.thread.join()
         print("Collection stopped.")
 
-    def get_epoch_data(self, block: bool = True, timeout: Optional[float] = None) -> Optional[List[int]]:
+    def get_epoch_data(self, block: bool = True, timeout: Optional[float] = None) -> Optional[int]:
         """
         큐에서 30초 분량의 데이터 epoch를 가져옵니다.
 
