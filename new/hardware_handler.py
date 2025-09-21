@@ -6,7 +6,12 @@ from luma.oled.device import ssd1306
 from PIL import Image, ImageDraw, ImageFont
 
 #set up pins
-BUZZER_PIN = 27,RESET_PIN = 4,SET_PIN = 23,VIBRATION_PIN = 27,CLK = 17,DT = 18
+BUZZER_PIN = 27
+RESET_PIN = 4
+SET_PIN = 23
+VIBRATION_PIN = 27
+CLK = 17
+DT = 18
 
 #GPIO setup
 GPIO.setmode(GPIO.BCM)
