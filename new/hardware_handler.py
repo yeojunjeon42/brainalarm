@@ -6,7 +6,12 @@ from luma.oled.device import ssd1306
 from PIL import Image, ImageDraw, ImageFont
 
 #set up pins
-BUZZER_PIN = 27,RESET_PIN = 4,SET_PIN = 23,VIBRATION_PIN = 27,CLK = 17,DT = 18
+BUZZER_PIN = 27
+RESET_PIN = 4
+SET_PIN = 23
+VIBRATION_PIN = 27
+CLK = 17
+DT = 18
 
 #GPIO setup
 GPIO.setmode(GPIO.BCM)
@@ -30,12 +35,12 @@ class Button:
 
 class RotaryEncoder:
     def __init__(self):
-        self.last_clk = GPIO.input(self.CLK)
+        self.last_clk = GPIO.input(CLK)
     
     def get_change(self):
-        clk_state = GPIO.input(self.CLK)  # Read current CLK pin state
+        clk_state = GPIO.input(CLK)  # Read current CLK pin state
         if self.last_clk == 0 and clk_state == 1:  # Detect rising edge on CLK
-            dt_state = GPIO.input(self.DT)  # Read DT pin state
+            dt_state = GPIO.input(DT)  # Read DT pin state
             return (1 if dt_state == 0 else -1)  # Adjust by ±5
         self.last_clk = clk_state  # Store current state for next iteration
 
@@ -69,6 +74,7 @@ class OLED:
         - port: 라즈베리파이의 I2C 포트 번호 (보통 1)
         - address: OLED의 I2C 주소 (보통 0x3C)
         """
+        GPIO.cleanup()
         try:
             # 1. I2C 통신 인터페이스를 설정합니다.
             self.serial = i2c(port=port, address=address)
