@@ -38,7 +38,7 @@ def main():
     state_manager = StateManager(buzzer)
     
     # EEG 분석기와 UI 렌더러 객체도 생성합니다.
-    eeg_processor = EEGReader(sleep_stage_model)
+    eeg_processor = EEGReader(sleep_stage_model, port='/dev/rfcomm0', baudrate=57600)
     renderer = UIRenderer()
     
     # 프로그램 시작 시 바로 스레드를 시작하지 않습니다.
