@@ -39,9 +39,9 @@ class RotaryEncoder:
     def __init__(self, clk_pin, dt_pin):
         self.clk_pin = clk_pin
         self.dt_pin = dt_pin
-        self.last_clk = GPIO.input(self.clk_pin)
         GPIO.setup(self.clk_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
         GPIO.setup(self.dt_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        self.last_clk = GPIO.input(self.clk_pin)
     
     def get_change(self):
         clk_state = GPIO.input(self.clk_pin)  # Read current CLK pin state
@@ -54,8 +54,8 @@ class Buzzer:
     def __init__(self, pin, reset_pin):
         #GPIO setup
         self.pin = pin
-        self.reset_pin = reset_pin
         GPIO.setup(self.pin, GPIO.OUT)
+        self.reset_pin = reset_pin
 
     def start(self):
         try:
@@ -83,14 +83,7 @@ class OLED:
         - port: 라즈베리파이의 I2C 포트 번호 (보통 1)
         - address: OLED의 I2C 주소 (보통 0x3C)
         """
-        #GPIO setup
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(BUZZER_PIN, GPIO.OUT)
-        GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
-        GPIO.setup(SET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.setup(VIBRATION_PIN, GPIO.OUT)
-        GPIO.setup(CLK, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
-        GPIO.setup(DT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
         try:
             # 1. I2C 통신 인터페이스를 설정합니다.
             self.serial = i2c(port=port, address=address)
