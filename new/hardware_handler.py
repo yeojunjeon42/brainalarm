@@ -128,10 +128,3 @@ class OLED:
         if not self.device: return
         with canvas(self.device) as draw:
             draw_function(draw, self) # draw 객체와 oled 객체 자신을 전달
-
-# Create instances to be imported
-oled = OLED()
-set_button = Button(SET_PIN)
-reset_button = Button(RESET_PIN)
-rotary_encoder = RotaryEncoder()
-buzzer = Buzzer()
