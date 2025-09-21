@@ -22,6 +22,7 @@ def main():
     # 1. 초기화 단계 (Initialization)
     # =================================================================
     eeg_processor = EEGReader(sleep_stage_model, port='/dev/rfcomm0', baudrate=57600)
+    print(eeg_processor.connect())
     # GPIO 핀 번호를 실제 연결에 맞게 정의합니다.
     BUZZER_PIN = 27
     SET_BUTTON_PIN = 23
