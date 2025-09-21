@@ -5,7 +5,7 @@ import threading
 import queue  # Thread-safe queue for communication
 from enum import Enum
 from typing import Optional, List, Any, Callable
-from ..src.processing.feature_extract import exfeature
+from feature_extract import exfeature
 import numpy as np
 
 # ThinkGear Protocol Constants (이전 코드와 동일)
