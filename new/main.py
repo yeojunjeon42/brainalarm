@@ -27,6 +27,7 @@ def main():
     RESET_BUTTON_PIN = 4
     ENCODER_CLK_PIN = 17
     ENCODER_DT_PIN = 18
+    GPIO.setwarnings(False)
 
     GPIO.setmode(GPIO.BCM)
     # GPIO.setup(BUZZER_PIN, GPIO.OUT)
