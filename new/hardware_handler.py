@@ -45,10 +45,12 @@ class RotaryEncoder:
     
     def get_change(self):
         clk_state = GPIO.input(self.clk_pin)  # Read current CLK pin state
+        change = 0
         if self.last_clk == 0 and clk_state == 1:  # Detect rising edge on CLK
             dt_state = GPIO.input(self.dt_pin)  # Read DT pin state
-            return (1 if dt_state == 0 else -1)  # Adjust by ±5
+            change = 1 if dt_state == 0 else -1  # Adjust by ±5
         self.last_clk = clk_state  # Store current state for next iteration
+        return change
 
 class Buzzer:
     def __init__(self, pin, reset_pin):
