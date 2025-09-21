@@ -14,7 +14,7 @@ class UIRenderer:
         StateManager의 현재 상태를 기반으로 적절한 화면을 OLED에 렌더링합니다.
         """
         # oled.display() 메서드에 실제 그리는 함수를 전달합니다.
-        oled.display(lambda draw: self._draw_scene(draw, oled, state_manager))
+        oled.display(lambda draw, oled: self._draw_scene(draw, oled, state_manager))
 
     def _draw_scene(self, draw, oled, state_manager):
         """
