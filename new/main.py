@@ -21,6 +21,7 @@ def main():
     # =================================================================
     # 1. 초기화 단계 (Initialization)
     # =================================================================
+    eeg_processor = EEGReader(sleep_stage_model, port='/dev/rfcomm0', baudrate=57600)
     # GPIO 핀 번호를 실제 연결에 맞게 정의합니다.
     BUZZER_PIN = 27
     SET_BUTTON_PIN = 23
@@ -47,7 +48,6 @@ def main():
     state_manager = StateManager(buzzer)
     
     # EEG 분석기와 UI 렌더러 객체도 생성합니다.
-    eeg_processor = EEGReader(sleep_stage_model, port='/dev/rfcomm0', baudrate=57600)
     renderer = UIRenderer()
     
     # 프로그램 시작 시 바로 스레드를 시작하지 않습니다.
