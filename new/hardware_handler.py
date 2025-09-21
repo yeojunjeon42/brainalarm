@@ -36,46 +36,71 @@ class Button:
         self.last_state = current_state
         return was_pressed
 
+import RPi.GPIO as GPIO
+import time
+import threading
+
 class RotaryEncoder:
+    """
+    인터럽트 대신 폴링(Polling) 방식을 사용하여 로터리 엔코더의 입력을 감지하는 클래스.
+    백그라운드 스레드를 사용하여 메인 프로그램의 동작을 방해하지 않습니다.
+    """
     def __init__(self, clk_pin, dt_pin):
         self.clk_pin = clk_pin
         self.dt_pin = dt_pin
-        
-        # 스레드 충돌을 방지하기 위한 Lock 객체
-        self.lock = threading.Lock()
-        self.change_value = 0
 
         # GPIO 핀 설정
         GPIO.setup(self.clk_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.setup(self.dt_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        
-        # CLK 핀에 RISING(신호가 0->1이 될 때) 인터럽트 설정
-        # 변화가 감지되면 self._callback 함수가 실행됩니다.
-        try:
-            GPIO.remove_event_detect(self.clk_pin)
-        except RuntimeError:
-            # 설정된 인터럽트가 없으면 오류가 발생하므로, 무시합니다.
-            pass
-        GPIO.add_event_detect(self.clk_pin, GPIO.RISING, callback=self._callback, bouncetime=10)
 
-    def _callback(self):
-        # 인터럽트 콜백 함수
-        # DT 핀의 상태를 읽어 방향을 결정합니다.
-        # 여러 신호가 동시에 접근하는 것을 막기 위해 lock을 사용합니다.
-        with self.lock:
-            dt_state = GPIO.input(self.dt_pin)
-            if dt_state == 0:
-                self.change_value += 1  # 정방향
-            else:
-                self.change_value -= 1  # 역방향
+        # 상태 저장을 위한 변수들
+        self.change_value = 0
+        self.clk_last_state = GPIO.input(self.clk_pin)
+        self.lock = threading.Lock() # 스레드 간 데이터 충돌 방지를 위한 Lock
+        self.running = True
+
+        # 백그라운드에서 핀 상태를 계속 확인할 스레드 생성 및 시작
+        # daemon=True로 설정하여 메인 프로그램 종료 시 스레드도 함께 종료되도록 함
+        self.poll_thread = threading.Thread(target=self._poll_loop, daemon=True)
+        self.poll_thread.start()
+
+    def _poll_loop(self):
+        """백그라운드 스레드에서 실행될 메인 루프"""
+        while self.running:
+            # 현재 CLK 핀 상태 읽기
+            clk_state = GPIO.input(self.clk_pin)
+
+            # CLK 핀의 상태가 이전과 다를 경우 (즉, 변화가 감지된 경우)
+            if clk_state != self.clk_last_state:
+                # DT 핀의 상태를 읽어서 회전 방향 판단
+                dt_state = GPIO.input(self.dt_pin)
+                
+                # Lock을 사용하여 안전하게 self.change_value 수정
+                with self.lock:
+                    if dt_state != clk_state:
+                        self.change_value += 1  # 시계 방향
+                    else:
+                        self.change_value -= 1  # 반시계 방향
+            
+            # 현재 CLK 상태를 마지막 상태로 저장
+            self.clk_last_state = clk_state
+            
+            # CPU 사용량을 100%로 만들지 않기 위해 아주 잠깐 대기 (필수)
+            time.sleep(0.001) # 1ms
 
     def get_change(self):
-        # main.py에서 호출하는 함수
-        # 인터럽트를 통해 누적된 값을 반환하고 초기화합니다.
+        """
+        main.py에서 호출하는 함수.
+        누적된 값(회전 정도)을 반환하고 0으로 초기화합니다.
+        """
         with self.lock:
             value = self.change_value
-            self.change_value = 0  # 값을 읽어간 후에는 0으로 리셋
+            self.change_value = 0
         return value
+
+    def stop(self):
+        """백그라운드 스레드를 안전하게 종료하기 위한 함수"""
+        self.running = False
 
 class Buzzer:
     def __init__(self, pin, reset_pin):
