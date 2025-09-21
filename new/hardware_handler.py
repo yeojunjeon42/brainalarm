@@ -35,12 +35,12 @@ class Button:
 
 class RotaryEncoder:
     def __init__(self):
-        self.last_clk = GPIO.input(self.CLK)
+        self.last_clk = GPIO.input(CLK)
     
     def get_change(self):
-        clk_state = GPIO.input(self.CLK)  # Read current CLK pin state
+        clk_state = GPIO.input(CLK)  # Read current CLK pin state
         if self.last_clk == 0 and clk_state == 1:  # Detect rising edge on CLK
-            dt_state = GPIO.input(self.DT)  # Read DT pin state
+            dt_state = GPIO.input(DT)  # Read DT pin state
             return (1 if dt_state == 0 else -1)  # Adjust by ±5
         self.last_clk = clk_state  # Store current state for next iteration
 
