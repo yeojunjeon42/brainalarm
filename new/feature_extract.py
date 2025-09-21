@@ -1,4 +1,4 @@
-import new.signal_processing as utils
+import signal_processing as utils
 import yasa
 
 delta = [0.5,4]
