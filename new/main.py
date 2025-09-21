@@ -125,6 +125,8 @@ def main():
             eeg_processor.stop_collection()
         eeg_processor.disconnect()
         buzzer.stop()
+        if 'rotary_encoder' in locals() and rotary_encoder is not None:
+            rotary_encoder.stop()
         GPIO.cleanup() # 모든 GPIO 설정을 깨끗하게 초기화합니다.
 
 if __name__ == "__main__":
