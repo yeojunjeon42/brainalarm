@@ -74,6 +74,7 @@ class OLED:
         - port: 라즈베리파이의 I2C 포트 번호 (보통 1)
         - address: OLED의 I2C 주소 (보통 0x3C)
         """
+        GPIO.cleanup()
         try:
             # 1. I2C 통신 인터페이스를 설정합니다.
             self.serial = i2c(port=port, address=address)
