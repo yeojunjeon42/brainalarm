@@ -17,13 +17,6 @@ GPIO.setup(VIBRATION_PIN, GPIO.OUT)
 GPIO.setup(CLK, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
 GPIO.setup(DT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-class OLED:
-    def __init__(self):
-        pass
-    
-    # Methods will be called by state_manager.render()
-    # Add other display methods as needed
-
 class Button:
     def __init__(self, pin):
         self.pin = pin
