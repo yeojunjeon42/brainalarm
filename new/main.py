@@ -5,6 +5,7 @@ import RPi.GPIO as GPIO
 import os
 import joblib
 from state_manager import StateManager
+from pytz import timezone
 
 # --- 필요한 모듈 임포트 ---
 # 각 파일에 실제 하드웨어 제어 클래스가 구현되어 있어야 합니다.
@@ -62,10 +63,10 @@ def main():
                 state_manager.handle_rotation(encoder_change)
 
             # --- 2.2. 뇌파 분석 스레드 관리 (EEG Thread Management) ---
-            now_time = datetime.now().time()
+            now_time = datetime.now(timezone('Asia/Seoul')).time()
             
             # StateManager로부터 현재 설정된 wake_window 시간을 계산합니다.
-            target_dt = datetime.combine(datetime.today(), state_manager.target_time)
+            target_dt = datetime.combine(datetime.today(timezone('Asia/Seoul')), state_manager.target_time)
             window_start_dt = target_dt - timedelta(minutes=state_manager.window_duration_minutes)
             window_start_time = window_start_dt.time()
             window_end_time = state_manager.target_time
