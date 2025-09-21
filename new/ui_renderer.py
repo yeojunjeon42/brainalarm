@@ -1,11 +1,13 @@
 # ui_renderer.py
 from datetime import datetime
 from state_manager import State # State Enum 임포트
+from PIL import Image, ImageDraw, ImageFont
 
 class UIRenderer:
     def __init__(self):
         # UI에 필요한 리소스(예: 아이콘 이미지)가 있다면 여기서 로드합니다.
         pass
+
 
     def render(self, oled, state_manager):
         """
