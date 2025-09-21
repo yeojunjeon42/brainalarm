@@ -26,15 +26,8 @@ DT = 18
 class Button:
     def __init__(self, pin):
         self.pin = pin
+        GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         self.last_state = GPIO.input(self.pin) #default state is high
-        #GPIO setup
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(BUZZER_PIN, GPIO.OUT)
-        GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
-        GPIO.setup(SET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.setup(VIBRATION_PIN, GPIO.OUT)
-        GPIO.setup(CLK, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
-        GPIO.setup(DT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
     def was_pressed(self):
         current_state = GPIO.input(self.pin)
@@ -43,49 +36,42 @@ class Button:
         return was_pressed
 
 class RotaryEncoder:
-    def __init__(self):
-        self.last_clk = GPIO.input(CLK)
+    def __init__(self, clk_pin, dt_pin):
+        self.clk_pin = clk_pin
+        self.dt_pin = dt_pin
+        self.last_clk = GPIO.input(self.clk_pin)
         #GPIO setup
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(BUZZER_PIN, GPIO.OUT)
-        GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
-        GPIO.setup(SET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.setup(VIBRATION_PIN, GPIO.OUT)
-        GPIO.setup(CLK, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
-        GPIO.setup(DT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(self.clk_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+        GPIO.setup(self.dt_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
     def get_change(self):
-        clk_state = GPIO.input(CLK)  # Read current CLK pin state
+        clk_state = GPIO.input(self.clk_pin)  # Read current CLK pin state
         if self.last_clk == 0 and clk_state == 1:  # Detect rising edge on CLK
-            dt_state = GPIO.input(DT)  # Read DT pin state
+            dt_state = GPIO.input(self.dt_pin)  # Read DT pin state
             return (1 if dt_state == 0 else -1)  # Adjust by ±5
         self.last_clk = clk_state  # Store current state for next iteration
 
 class Buzzer:
-    def __init__(self):
+    def __init__(self, pin, reset_pin):
         #GPIO setup
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(BUZZER_PIN, GPIO.OUT)
-        GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
-        GPIO.setup(SET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.setup(VIBRATION_PIN, GPIO.OUT)
-        GPIO.setup(CLK, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
-        GPIO.setup(DT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    
+        self.pin = pin
+        self.reset_pin = reset_pin
+        GPIO.setup(self.pin, GPIO.OUT)
 
     def start(self):
         try:
-            while GPIO.input(RESET_PIN): #long press reset button to reset
-                GPIO.output(BUZZER_PIN, GPIO.HIGH)
+            while GPIO.input(self.reset_pin): #long press reset button to reset
+                GPIO.output(self.pin, GPIO.HIGH)
                 time.sleep(0.5)
-                GPIO.output(BUZZER_PIN, GPIO.LOW)
+                GPIO.output(self.pin, GPIO.LOW)
                 time.sleep(0.5)
         except KeyboardInterrupt:
-            GPIO.output(BUZZER_PIN, GPIO.LOW)
+            GPIO.output(self.pin, GPIO.LOW)
             GPIO.cleanup()
     
     def stop(self):
-        GPIO.output(BUZZER_PIN, GPIO.LOW)
+        GPIO.output(self.pin, GPIO.LOW)
         GPIO.cleanup()
 
 class OLED:

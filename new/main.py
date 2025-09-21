@@ -29,14 +29,14 @@ def main():
     ENCODER_DT_PIN = 18
 
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(BUZZER_PIN, GPIO.OUT)
-    GPIO.setup(RESET_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
-    GPIO.setup(SET_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(ENCODER_CLK_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
-    GPIO.setup(ENCODER_DT_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # GPIO.setup(BUZZER_PIN, GPIO.OUT)
+    # GPIO.setup(RESET_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
+    # GPIO.setup(SET_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # GPIO.setup(ENCODER_CLK_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+    # GPIO.setup(ENCODER_DT_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     # 각 모듈의 객체를 생성합니다.
-    buzzer = Buzzer(BUZZER_PIN)
+    buzzer = Buzzer(BUZZER_PIN, RESET_BUTTON_PIN)
     set_button = Button(SET_BUTTON_PIN)
     reset_button = Button(RESET_BUTTON_PIN)
     rotary_encoder = RotaryEncoder(ENCODER_CLK_PIN, ENCODER_DT_PIN)
