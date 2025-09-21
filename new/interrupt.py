@@ -1,27 +1,24 @@
-import RPi.GPIO as GPIO
+# gpiozero_test.py
+from gpiozero import Button
 import time
+import signal
 
-# 문제가 발생하는 17번 핀을 테스트합니다.
-PIN = 26
+# BCM 17번 핀으로 테스트
+PIN = 17
 
-def my_callback(channel):
-    print(f"성공! >> 인터럽트 감지됨: {channel}번 핀")
+def on_press():
+    print(f"성공! >> {PIN}번 핀에서 입력 감지됨 (인터럽트 동작)")
 
 try:
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    
-    print(f"{PIN}번 핀에 인터럽트 설정을 시도합니다...")
-    GPIO.add_event_detect(PIN, GPIO.RISING, callback=my_callback, bouncetime=200)
-    print("인터럽트 설정 성공. 입력을 기다립니다. (Ctrl+C로 종료)")
-    
-    while True:
-        time.sleep(1)
+    # pull_up=True는 내부 저항을 사용하겠다는 의미입니다.
+    button = Button(PIN, pull_up=True)
+    button.when_pressed = on_press
 
-except KeyboardInterrupt:
-    print("프로그램 종료.")
+    print(f"gpiozero 라이브러리 테스트 시작. {PIN}번 핀에 입력을 주세요...")
+    print("(Ctrl+C로 종료)")
+
+    # 스크립트가 바로 종료되지 않도록 대기
+    signal.pause()
+
 except Exception as e:
     print(f"오류 발생: {e}")
-finally:
-    print("GPIO 정리.")
-    GPIO.cleanup()
