@@ -71,7 +71,7 @@ def main():
                 state_manager.handle_rotation(encoder_change)
 
             # --- 2.2. 뇌파 분석 스레드 관리 (EEG Thread Management) ---
-            now_time = datetime.now(timezone('Asia/Seoul')).time()
+            now_time = datetime.now().time()
             
             # StateManager로부터 현재 설정된 wake_window 시간을 계산합니다.
             target_dt = datetime.combine(datetime.today(), state_manager.target_time)
