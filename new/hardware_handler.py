@@ -27,6 +27,15 @@ class Button:
     def __init__(self, pin):
         self.pin = pin
         self.last_state = GPIO.input(self.pin) #default state is high
+        #GPIO setup
+        GPIO.cleanup()
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(BUZZER_PIN, GPIO.OUT)
+        GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
+        GPIO.setup(SET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(VIBRATION_PIN, GPIO.OUT)
+        GPIO.setup(CLK, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+        GPIO.setup(DT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
     def was_pressed(self):
         current_state = GPIO.input(self.pin)
@@ -37,6 +46,15 @@ class Button:
 class RotaryEncoder:
     def __init__(self):
         self.last_clk = GPIO.input(CLK)
+        #GPIO setup
+        GPIO.cleanup()
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(BUZZER_PIN, GPIO.OUT)
+        GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
+        GPIO.setup(SET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(VIBRATION_PIN, GPIO.OUT)
+        GPIO.setup(CLK, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+        GPIO.setup(DT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
     def get_change(self):
         clk_state = GPIO.input(CLK)  # Read current CLK pin state
@@ -47,7 +65,16 @@ class RotaryEncoder:
 
 class Buzzer:
     def __init__(self):
-        pass
+        #GPIO setup
+        GPIO.cleanup()
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(BUZZER_PIN, GPIO.OUT)
+        GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
+        GPIO.setup(SET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(VIBRATION_PIN, GPIO.OUT)
+        GPIO.setup(CLK, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+        GPIO.setup(DT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    
 
     def start(self):
         try:
@@ -75,7 +102,15 @@ class OLED:
         - port: 라즈베리파이의 I2C 포트 번호 (보통 1)
         - address: OLED의 I2C 주소 (보통 0x3C)
         """
+        #GPIO setup
         GPIO.cleanup()
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(BUZZER_PIN, GPIO.OUT)
+        GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
+        GPIO.setup(SET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(VIBRATION_PIN, GPIO.OUT)
+        GPIO.setup(CLK, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+        GPIO.setup(DT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         try:
             # 1. I2C 통신 인터페이스를 설정합니다.
             self.serial = i2c(port=port, address=address)
