@@ -182,7 +182,7 @@ class EEGReader:
 
     def get_epoch_data(self, block: bool = True, timeout: Optional[float] = None) -> Optional[int]:
         """
-        큐에서 30초 분량의 데이터 epoch를 가져옵니다.
+        큐에서 30초 분량의 데이터 epoch를 가져와서 모델로 예측을 수행합니다.
 
         Args:
             block (bool): True이면 데이터가 있을 때까지 기다립니다 (블로킹).
