@@ -14,6 +14,7 @@ CLK = 17
 DT = 18
 
 #GPIO setup
+GPIO.cleanup()
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(BUZZER_PIN, GPIO.OUT)
 GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
