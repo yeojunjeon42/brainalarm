@@ -112,7 +112,7 @@ def main():
             renderer.render(oled, state_manager)
 
             # --- 2.5. 처리 속도 조절 (Loop Delay) ---
-            time.sleep(0.5)
+            time.sleep(0.05)
 
     except KeyboardInterrupt:
         print("\n프로그램을 종료합니다.")
