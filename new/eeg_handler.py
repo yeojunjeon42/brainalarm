@@ -118,45 +118,98 @@ class EEGReader:
         
         elif code == CODE_POOR_SIGNAL and len(value) == 1:
             self._quality_buffer.append(value[0])
+    # eeg_handler.py의 EEGReader 클래스 내부
 
     def _data_collection_loop(self):
-        """The main loop for the thread, running continuously."""
-        print(f"Continuous data collection thread started...")
+        """
+        백그라운드 스레드의 메인 루프.
+        오류 발생 시 상세 내용을 출력하도록 수정되었습니다.
+        """
+        print(">>> EEG 데이터 수집 스레드가 시작되었습니다...")
         
-        while self.running:
-            try:
-                # 1. Read from serial and parse bytes
+        try: # 전체 루프를 try 블록으로 감싸서 모든 오류를 잡습니다.
+            while self.running:
+                # 1. 시리얼 포트에서 데이터 읽기 시도
                 if self.serial_conn and self.serial_conn.in_waiting > 0:
                     byte = self.serial_conn.read(1)[0]
                     self.parser.parse_byte(byte)
                 else:
                     time.sleep(0.001)
 
-                # 2. Check if a 30-second epoch is complete
+                # 2. 30초 분량 데이터가 모였는지 확인 (기존 로직)
                 if len(self._raw_buffer) >= self.target_sample_count:
-                    print(f"--- 30-second epoch collected. Processing... ---")
+                    print(f"--- 30초 epoch 수집 완료. 처리 중... ---")
                     
                     result: Optional[List[int]] = None
-                    # Check signal quality
+                    # 신호 품질 확인
                     if self._quality_buffer and all(q == 0 for q in self._quality_buffer):
-                        print("Signal quality was GOOD. Passing data.")
+                        print("신호 품질: 양호. 데이터 처리합니다.")
                         result = list(self._raw_buffer)
                     else:
-                        print("Signal quality was POOR. Discarding data.")
+                        print("신호 품질: 불량. 데이터를 폐기합니다.")
                         result = None
                     
-                    # 3. Put the result into the queue for the main thread
                     self.data_queue.put(result)
                     
-                    # 4. Clear buffers to start collecting the next epoch
                     self._raw_buffer.clear()
                     self._quality_buffer.clear()
 
-            except Exception as e:
-                print(f"Error in collection loop: {e}")
-                self.running = False
+        except Exception as e:
+            # 스레드 안에서 발생하는 모든 오류를 여기서 잡아서 출력합니다.
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print("!!! EEG 데이터 수집 스레드 내에서 심각한 오류 발생 !!!")
+            print(f"!!! 오류 타입: {type(e)}")
+            print(f"!!! 오류 메시지: {e}")
+            # traceback을 import해서 더 자세한 오류 위치를 볼 수도 있습니다.
+            import traceback
+            traceback.print_exc()
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         
-        print("One Data collection thread finished.")
+        finally:
+            # 루프가 어떤 이유로든 (정상 종료 또는 오류) 종료될 때 실행됩니다.
+            self.running = False # 스레드가 죽었음을 명확히 알립니다.
+            print(">>> EEG 데이터 수집 스레드가 종료되었습니다.")
+
+    # def _data_collection_loop(self):
+        
+    #     """The main loop for the thread, running continuously."""
+    #     print(f"Continuous data collection thread started...")
+        
+    #     while self.running:
+    #         try:
+    #             # 1. Read from serial and parse bytes
+    #             if self.serial_conn and self.serial_conn.in_waiting > 0:
+    #                 byte = self.serial_conn.read(1)[0]
+    #                 self.parser.parse_byte(byte)
+    #             else:
+    #                 time.sleep(0.001)
+
+    #             # 2. Check if a 30-second epoch is complete
+    #             if len(self._raw_buffer) >= self.target_sample_count:
+    #                 print(f"--- 30-second epoch collected. Processing... ---")
+                    
+    #                 result: Optional[List[int]] = None
+    #                 # Check signal quality
+    #                 if self._quality_buffer and all(q == 0 for q in self._quality_buffer):
+    #                     print("Signal quality was GOOD. Passing data.")
+    #                     result = list(self._raw_buffer)
+    #                 else:
+    #                     print("Signal quality was POOR. Discarding data.")
+    #                     result = None
+                    
+    #                 # 3. Put the result into the queue for the main thread
+    #                 self.data_queue.put(result)
+                    
+    #                 # 4. Clear buffers to start collecting the next epoch
+    #                 self._raw_buffer.clear()
+    #                 self._quality_buffer.clear()
+
+    #         except Exception as e:
+    #             print(f"Error in collection loop: {e}")
+    #             self.running = False
+        
+    #     print("One Data collection thread finished.")
+        
 
     def start_collection(self):
         if self.running:
