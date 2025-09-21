@@ -14,7 +14,7 @@ try:
     while True:
         pin_state = GPIO.input(READ_PIN)
         print(f"핀 상태: {pin_state}")
-        time.sleep(0.5)
+        time.sleep(0.05)
 
 except KeyboardInterrupt:
     print("\n테스트 종료.")
