@@ -40,8 +40,6 @@ class RotaryEncoder:
         self.clk_pin = clk_pin
         self.dt_pin = dt_pin
         self.last_clk = GPIO.input(self.clk_pin)
-        #GPIO setup
-        GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.clk_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
         GPIO.setup(self.dt_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
