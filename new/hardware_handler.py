@@ -14,21 +14,20 @@ CLK = 17
 DT = 18
 
 #GPIO setup
-GPIO.cleanup()
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(BUZZER_PIN, GPIO.OUT)
-GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
-GPIO.setup(SET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(VIBRATION_PIN, GPIO.OUT)
-GPIO.setup(CLK, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
-GPIO.setup(DT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+# GPIO.cleanup()
+# GPIO.setmode(GPIO.BCM)
+# GPIO.setup(BUZZER_PIN, GPIO.OUT)
+# GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
+# GPIO.setup(SET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+# GPIO.setup(VIBRATION_PIN, GPIO.OUT)
+# GPIO.setup(CLK, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+# GPIO.setup(DT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 class Button:
     def __init__(self, pin):
         self.pin = pin
         self.last_state = GPIO.input(self.pin) #default state is high
         #GPIO setup
-        GPIO.cleanup()
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(BUZZER_PIN, GPIO.OUT)
         GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
@@ -47,7 +46,6 @@ class RotaryEncoder:
     def __init__(self):
         self.last_clk = GPIO.input(CLK)
         #GPIO setup
-        GPIO.cleanup()
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(BUZZER_PIN, GPIO.OUT)
         GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
@@ -66,7 +64,6 @@ class RotaryEncoder:
 class Buzzer:
     def __init__(self):
         #GPIO setup
-        GPIO.cleanup()
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(BUZZER_PIN, GPIO.OUT)
         GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
@@ -103,7 +100,6 @@ class OLED:
         - address: OLED의 I2C 주소 (보통 0x3C)
         """
         #GPIO setup
-        GPIO.cleanup()
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(BUZZER_PIN, GPIO.OUT)
         GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
