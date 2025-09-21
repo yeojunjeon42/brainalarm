@@ -9,7 +9,7 @@ def my_callback(channel):
 
 try:
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     
     print(f"{PIN}번 핀에 인터럽트 설정을 시도합니다...")
     GPIO.add_event_detect(PIN, GPIO.RISING, callback=my_callback, bouncetime=200)
