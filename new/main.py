@@ -22,7 +22,6 @@ def main():
     # 1. 초기화 단계 (Initialization)
     # =================================================================
     # GPIO 핀 번호를 실제 연결에 맞게 정의합니다.
-    GPIO.cleanup()
     BUZZER_PIN = 27
     SET_BUTTON_PIN = 23
     RESET_BUTTON_PIN = 4

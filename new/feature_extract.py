@@ -26,7 +26,7 @@ def exfeature(data,fs=512):
         HC = utils.hjorth_complexity(band_data)
         LRSSV = utils.lrssv(band_data)
         features.extend([pfd,SE,SD,HA,HM,HC,LRSSV])
-    spindles = yasa.spindles_detect(data,sf=1000)
+    spindles = yasa.spindles_detect(data,sf=fs)
     if spindles is not None:
         num_spindle = len(spindles.summary())
         if num_spindle > 0:
