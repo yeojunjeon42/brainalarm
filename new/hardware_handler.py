@@ -125,7 +125,6 @@ class Buzzer:
     def stop(self):
         self.is_active = False
         GPIO.output(self.pin, GPIO.LOW)
-        GPIO.cleanup()
 
 class OLED:
     """
