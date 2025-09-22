@@ -50,6 +50,9 @@ def main():
     
     # EEG 분석기와 UI 렌더러 객체도 생성합니다.
     renderer = UIRenderer()
+
+    last_beep_time = 0
+    beep_state = False
     
     # 프로그램 시작 시 바로 스레드를 시작하지 않습니다.
     print("알람 시계 프로그램을 시작합니다. (Ctrl+C로 종료)")
@@ -106,7 +109,18 @@ def main():
                     print("알람 조건 충족! 진동을 시작합니다.")
                     # EEG 스레드는 이미 실행 중이므로, 중지하기만 하면 됩니다.
                     eeg_processor.stop_collection()
-                    buzzer.start()
+                    
+            #알람 토글
+            if state_manager.alarm_active:
+                # 0.5초마다 버저 상태를 토글(on/off)합니다.
+                current_time = time.time()
+                if (current_time - last_beep_time) > 0.5:
+                    last_beep_time = current_time
+                    beep_state = not beep_state # 상태 반전
+                    if beep_state:
+                        buzzer.on()
+                    else:
+                        buzzer.off()
 
             # --- 스레드 중지 조건 ---
             # 창 밖에 있고, 스레드가 켜져 있을 때

@@ -104,27 +104,24 @@ class RotaryEncoder:
 
 class Buzzer:
     def __init__(self, pin, reset_pin):
-        #GPIO setup
         self.pin = pin
         GPIO.setup(self.pin, GPIO.OUT)
-        self.reset_pin = reset_pin
+        # reset_pin은 이제 Buzzer 클래스에서 직접 사용하지 않습니다.
         self.is_active = False
 
-    def start(self):
-        self.is_active = True
-        try:
-            while GPIO.input(self.reset_pin): #long press reset button to reset
-                GPIO.output(self.pin, GPIO.HIGH)
-                time.sleep(0.5)
-                GPIO.output(self.pin, GPIO.LOW)
-                time.sleep(0.5)
-        except KeyboardInterrupt:
-            GPIO.output(self.pin, GPIO.LOW)
-            GPIO.cleanup()
+    def on(self):
+        """버저를 켭니다."""
+        GPIO.output(self.pin, GPIO.HIGH)
+
+    def off(self):
+        """버저를 끕니다."""
+        GPIO.output(self.pin, GPIO.LOW)
     
     def stop(self):
+        """알람 상태를 비활성화하고 버저를 끕니다."""
         self.is_active = False
-        GPIO.output(self.pin, GPIO.LOW)
+        self.off()
+        print("Buzzer stopped.")
 
 class OLED:
     """
