@@ -39,7 +39,7 @@ def main():
                 print(f"현재 카운트: {counter} (방향: {direction})")
 
             # 메인 루프가 CPU를 너무 많이 사용하지 않도록 잠시 대기합니다.
-            time.sleep(0.01)
+            time.sleep(0.05)
 
     except KeyboardInterrupt:
         # 사용자가 Ctrl+C를 누르면 실행됩니다.
