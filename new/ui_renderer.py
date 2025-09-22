@@ -1,7 +1,10 @@
 # ui_renderer.py
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from state_manager import State # State Enum 임포트
 from PIL import Image, ImageDraw, ImageFont
+
+
+kst = timezone(timedelta(hours=9))
 
 class UIRenderer:
     def __init__(self):
@@ -36,12 +39,12 @@ class UIRenderer:
             self._draw_set_target_time_screen(draw, oled, state_manager)
 
     def _draw_alarm_screen(self, draw, oled):
-        now_str = datetime.now().strftime('%H:%M:%S')
+        now_str = datetime.now(kst).strftime('%H:%M:%S')
         draw.text((15, 10), "WAKE UP!", font=oled._get_font('large'), fill="white")
         draw.text((40, 40), now_str, font=oled._get_font('small'), fill="white")
 
     def _draw_display_time_screen(self, draw, oled, state_manager):
-        now_str = datetime.now().strftime('%H:%M:%S')
+        now_str = datetime.now(kst).strftime('%H:%M:%S')
         target_str = state_manager.target_time.strftime('%H:%M')
         duration = state_manager.window_duration_minutes
 
