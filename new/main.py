@@ -88,7 +88,9 @@ def main():
             over_time = now_time >= window_end_time
             eeg_is_running = eeg_processor.is_running()
 
+            #설정 시간 지나고 알람 안 울리면
             if over_time and not buzzer.is_active:
+                state_manager.alarm_active = True
                 buzzer.start()
             # --- 스레드 시작 조건 ---
             # 창 안에 있고, 알람이 울리지 않으며, 스레드가 꺼져 있을 때

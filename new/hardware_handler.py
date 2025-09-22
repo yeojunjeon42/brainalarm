@@ -123,7 +123,7 @@ class Buzzer:
             GPIO.cleanup()
     
     def stop(self):
-        self.is_ative = False
+        self.is_active = False
         GPIO.output(self.pin, GPIO.LOW)
         GPIO.cleanup()
 
