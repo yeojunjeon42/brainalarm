@@ -63,8 +63,8 @@ class UIRenderer:
         target_str = state_manager.target_time.strftime('%H:%M')
         duration = state_manager.window_duration_minutes
 
-        draw.text((13, 10), now_str, font=oled._get_font('large'), fill="white")
-        draw.text((12, 40), f"Alarm: {target_str} ({duration}min)", font=oled._get_font('small'), fill="white")
+        draw.text((13, 13), now_str, font=oled._get_font('large'), fill="white")
+        draw.text((12, 45), f"Alarm: {target_str} ({duration}min)", font=oled._get_font('small'), fill="white")
 
     def _draw_set_duration_screen(self, draw, oled, state_manager):
         duration = state_manager.temp_window_duration_minutes
@@ -78,9 +78,9 @@ class UIRenderer:
 
         # 편집 모드에 따라 텍스트 주변에 상자(강조)를 그립니다.
         if state_manager.edit_mode.name == 'HOUR':
-            draw.rectangle((30, 28, 58, 48), outline="white", fill="black")
+            draw.rectangle((30, 28, 62, 52), outline="white", fill="black")
         else: # MINUTE
-            draw.rectangle((68, 28, 96, 48), outline="white", fill="black")
+            draw.rectangle((66, 28, 96, 52), outline="white", fill="black")
 
         draw.text((10, 10), "Set Target Time", font=oled._get_font('small'), fill="white")
         draw.text((32, 30), f"{hour_str}:{minute_str}", font=oled._get_font('large'), fill="white")
