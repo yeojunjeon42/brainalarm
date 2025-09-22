@@ -103,7 +103,7 @@ def main():
             # 스레드가 실행 중일 때만 뇌파를 확인하고 알람 조건을 체크합니다.
             if eeg_is_running and not state_manager.alarm_active:
                 current_sleep_stage = eeg_processor.get_epoch_data(block=False)
-            alarm_triggered = state_manager.check_alarm_condition(current_sleep_stage)
+                alarm_triggered = state_manager.check_alarm_condition(current_sleep_stage)
 
             if alarm_triggered:
                 print("알람 조건 충족! 진동을 시작합니다.")
