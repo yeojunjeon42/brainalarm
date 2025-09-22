@@ -112,7 +112,6 @@ class StateManager:
 
         # 조건 충족 시, 알람을 활성화하고 True를 반환하여 main.py에 알립니다.
         if is_target_time or (is_in_window and sleep_stage == 1): #N2면 1
-            print("Done")
             self.alarm_active = True
             return True
             

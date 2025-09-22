@@ -101,20 +101,20 @@ def main():
             # 스레드가 실행 중일 때만 뇌파를 확인하고 알람 조건을 체크합니다.
             if eeg_is_running and not state_manager.alarm_active:
                 current_sleep_stage = eeg_processor.get_epoch_data(block=False)
-                alarm_triggered = state_manager.check_alarm_condition(current_sleep_stage)
+            alarm_triggered = state_manager.check_alarm_condition(current_sleep_stage)
                 
-                if alarm_triggered:
-                    print("알람 조건 충족! 진동을 시작합니다.")
-                    # EEG 스레드는 이미 실행 중이므로, 중지하기만 하면 됩니다.
-                    eeg_processor.stop_collection()
-                    buzzer.start()
+            if alarm_triggered:
+                print("알람 조건 충족! 진동을 시작합니다.")
+                # EEG 스레드는 이미 실행 중이므로, 중지하기만 하면 됩니다.
+                eeg_processor.stop_collection()
+                buzzer.start()
             
             # --- 2.4. 화면 출력 (Output Rendering) ---
             # 현재 상태에 맞는 화면을 그려달라고 Renderer에게 요청합니다.
             renderer.render(oled, state_manager)
             print(datetime.now(kst).time(), state_manager.target_time)
             # --- 2.5. 처리 속도 조절 (Loop Delay) ---
-            time.sleep(1)
+            time.sleep(0.05)
 
     except KeyboardInterrupt:
         print("\n프로그램을 종료합니다.")
