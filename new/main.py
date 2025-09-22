@@ -102,6 +102,7 @@ def main():
             # --- 2.3. 상태 확인 및 로직 처리 (Logic Processing) ---
             # 스레드가 실행 중일 때만 뇌파를 확인하고 알람 조건을 체크합니다.
             if eeg_is_running and not state_manager.alarm_active:
+            #eeg 돌아가는 시작 시간 이후인지?
                 current_sleep_stage = eeg_processor.get_epoch_data(block=False)
                 alarm_triggered = state_manager.check_alarm_condition(current_sleep_stage)
 
