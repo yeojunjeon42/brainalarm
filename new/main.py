@@ -112,9 +112,9 @@ def main():
             # --- 2.4. 화면 출력 (Output Rendering) ---
             # 현재 상태에 맞는 화면을 그려달라고 Renderer에게 요청합니다.
             renderer.render(oled, state_manager)
-
+            print(datetime.now(kst).time(), state_manager.target_time)
             # --- 2.5. 처리 속도 조절 (Loop Delay) ---
-            time.sleep(0.05)
+            time.sleep(1)
 
     except KeyboardInterrupt:
         print("\n프로그램을 종료합니다.")
