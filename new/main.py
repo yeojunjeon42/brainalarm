@@ -88,21 +88,12 @@ def main():
             over_time = now_time >= window_end_time
             eeg_is_running = eeg_processor.is_running()
 
-            #설정 시간 지나고 알람 안 울리면
-            if over_time and not buzzer.is_active:
-                state_manager.alarm_active = True
-                buzzer.start()
             # --- 스레드 시작 조건 ---
             # 창 안에 있고, 알람이 울리지 않으며, 스레드가 꺼져 있을 때
             if is_in_window and not state_manager.alarm_active and not eeg_is_running:
                 print(f"Wake window 시작({window_start_time.strftime('%H:%M')}). 뇌파 분석을 시작합니다.")
                 eeg_processor.start_collection()
 
-            # --- 스레드 중지 조건 ---
-            # 창 밖에 있고, 스레드가 켜져 있을 때
-            if not is_in_window and eeg_is_running:
-                print(f"Wake window 종료. 뇌파 분석을 중지합니다.")
-                eeg_processor.stop_collection()
 
             # --- 2.3. 상태 확인 및 로직 처리 (Logic Processing) ---
             # 스레드가 실행 중일 때만 뇌파를 확인하고 알람 조건을 체크합니다.
@@ -116,6 +107,12 @@ def main():
                     # EEG 스레드는 이미 실행 중이므로, 중지하기만 하면 됩니다.
                     eeg_processor.stop_collection()
                     buzzer.start()
+
+            # --- 스레드 중지 조건 ---
+            # 창 밖에 있고, 스레드가 켜져 있을 때
+            if not is_in_window and eeg_is_running:
+                print(f"Wake window 종료. 뇌파 분석을 중지합니다.")
+                eeg_processor.stop_collection()
             
             # --- 2.4. 화면 출력 (Output Rendering) ---
             # 현재 상태에 맞는 화면을 그려달라고 Renderer에게 요청합니다.
