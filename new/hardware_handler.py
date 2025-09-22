@@ -108,8 +108,10 @@ class Buzzer:
         self.pin = pin
         GPIO.setup(self.pin, GPIO.OUT)
         self.reset_pin = reset_pin
+        self.is_active = False
 
     def start(self):
+        self.is_active = True
         try:
             while GPIO.input(self.reset_pin): #long press reset button to reset
                 GPIO.output(self.pin, GPIO.HIGH)
@@ -121,6 +123,7 @@ class Buzzer:
             GPIO.cleanup()
     
     def stop(self):
+        self.is_ative = False
         GPIO.output(self.pin, GPIO.LOW)
         GPIO.cleanup()
 

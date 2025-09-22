@@ -247,8 +247,9 @@ class EEGReader:
         """
         try:
             # block과 timeout 옵션을 queue.get()에 직접 전달합니다.
-            datas = np.array(self.data_queue.get(block=block, timeout=timeout))
-            predicted_stage = self.model.predict(datas.reshape(1,-1))[0]
+            datas = list(self.data_queue.get(block=block, timeout=timeout))
+            features = np.array(exfeature(datas))
+            predicted_stage = self.model.predict(features.reshape(1,-1))[0]
             return predicted_stage
         except queue.Empty:
             # 큐가 비어있을 때 (논블로킹 모드 또는 타임아웃) 발생하는 예외입니다.
