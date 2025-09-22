@@ -60,6 +60,7 @@ def main():
         # =================================================================
         while True:
             alarm_triggered = False
+            current_sleep_stage = 0
             # --- 2.1. 입력 감지 (Input Gathering) ---
             # 사용자의 버튼 및 엔코더 조작을 확인합니다.
             if set_button.was_pressed():
