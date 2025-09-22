@@ -69,7 +69,7 @@ class UIRenderer:
     def _draw_set_duration_screen(self, draw, oled, state_manager):
         duration = state_manager.temp_window_duration_minutes
         draw.text((10, 10), "Set Window", font=oled._get_font('small'), fill="white")
-        draw.text((15, 30), f" {duration:02d} min ", font=oled._get_font('large'), fill="white")
+        draw.text((20, 30), f" {duration:02d} min ", font=oled._get_font('large'), fill="white")
 
     def _draw_set_target_time_screen(self, draw, oled, state_manager):
         temp_time = state_manager.temp_target_time
