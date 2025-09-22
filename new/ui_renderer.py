@@ -63,8 +63,8 @@ class UIRenderer:
         target_str = state_manager.target_time.strftime('%H:%M')
         duration = state_manager.window_duration_minutes
 
-        draw.text((10, 10), now_str, font=oled._get_font('large'), fill="white")
-        draw.text((10, 40), f"Alarm: {target_str} ({duration}min)", font=oled._get_font('small'), fill="white")
+        draw.text((13, 10), now_str, font=oled._get_font('large'), fill="white")
+        draw.text((12, 40), f"Alarm: {target_str} ({duration}min)", font=oled._get_font('small'), fill="white")
 
     def _draw_set_duration_screen(self, draw, oled, state_manager):
         duration = state_manager.temp_window_duration_minutes
