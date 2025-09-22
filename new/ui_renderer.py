@@ -80,7 +80,7 @@ class UIRenderer:
         if state_manager.edit_mode.name == 'HOUR':
             draw.rectangle((30, 28, 60, 52), outline="white", fill="black")
         else: # MINUTE
-            draw.rectangle((64, 28, 96, 52), outline="white", fill="black")
+            draw.rectangle((68, 28, 96, 52), outline="white", fill="black")
 
         draw.text((10, 10), "Set Target Time", font=oled._get_font('small'), fill="white")
         draw.text((32, 30), f"{hour_str}:{minute_str}", font=oled._get_font('large'), fill="white")
