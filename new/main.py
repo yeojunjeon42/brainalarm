@@ -1,11 +1,10 @@
 # main.py
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import RPi.GPIO as GPIO
 import os
 import joblib
 from state_manager import StateManager
-from pytz import timezone
 
 # --- 필요한 모듈 임포트 ---
 # 각 파일에 실제 하드웨어 제어 클래스가 구현되어 있어야 합니다.
@@ -16,6 +15,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, 'models/sleep_stage_classifier.joblib')
 sleep_stage_model = joblib.load(MODEL_PATH)
 
+kst = timezone(timedelta(hours=9))
 def main():
     """메인 실행 함수"""
     # =================================================================
@@ -72,10 +72,11 @@ def main():
                 state_manager.handle_rotation(encoder_change)
 
             # --- 2.2. 뇌파 분석 스레드 관리 (EEG Thread Management) ---
-            now_time = datetime.now().time()
+            now_time = datetime.now(kst).time()
             
             # StateManager로부터 현재 설정된 wake_window 시간을 계산합니다.
-            target_dt = datetime.combine(datetime.today(), state_manager.target_time)
+            # today_kst = datetime.now(kst).date()
+            target_dt = datetime.combine(datetime.now(kst).date(), state_manager.target_time)
             window_start_dt = target_dt - timedelta(minutes=state_manager.window_duration_minutes)
             window_start_time = window_start_dt.time()
             window_end_time = state_manager.target_time
