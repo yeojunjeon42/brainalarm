@@ -104,6 +104,7 @@ class StateManager:
         now_time = now.time()
 
         target_datetime = datetime.combine(now.date(), self.target_time)
+        target_datetime = target_datetime.replace(tzinfo=kst)
         window_start_datetime = target_datetime - timedelta(minutes=self.window_duration_minutes)
         calculated_window_start_time = window_start_datetime.time()
 
