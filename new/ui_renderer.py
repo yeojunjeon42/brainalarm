@@ -42,19 +42,34 @@ class UIRenderer:
         now_str = datetime.now(kst).strftime('%H:%M:%S')
         draw.text((15, 10), "WAKE UP!", font=oled._get_font('large'), fill="white")
         draw.text((40, 40), now_str, font=oled._get_font('small'), fill="white")
+        # wake_up_text = "WAKE UP!"
+        # wake_up_font = oled._get_font('large')
+        # wake_up_bbox = draw.textbbox((0, 0), wake_up_text, font=wake_up_font)
+        # wake_up_width = wake_up_bbox[2] - wake_up_bbox[0]
+        # wake_up_x = (oled.width - wake_up_width) / 2
+        # draw.text((wake_up_x, 10), wake_up_text, font=wake_up_font, fill="white")
+
+        # # Time text
+        # now_str = datetime.now(kst).strftime('%H:%M:%S')
+        # now_font = oled._get_font('small')
+        # now_bbox = draw.textbbox((0, 0), now_str, font=now_font)
+        # now_width = now_bbox[2] - now_bbox[0]
+        # now_x = (oled.width - now_width) / 2
+        # draw.text((now_x, 40), now_str, font=now_font, fill="white")
+
 
     def _draw_display_time_screen(self, draw, oled, state_manager):
         now_str = datetime.now(kst).strftime('%H:%M:%S')
         target_str = state_manager.target_time.strftime('%H:%M')
         duration = state_manager.window_duration_minutes
 
-        draw.text((25, 10), now_str, font=oled._get_font('large'), fill="white")
-        draw.text((20, 40), f"Alarm: {target_str} ({duration}min)", font=oled._get_font('small'), fill="white")
+        draw.text((20, 10), now_str, font=oled._get_font('large'), fill="white")
+        draw.text((15, 40), f"Alarm: {target_str} ({duration}min)", font=oled._get_font('small'), fill="white")
 
     def _draw_set_duration_screen(self, draw, oled, state_manager):
         duration = state_manager.temp_window_duration_minutes
         draw.text((10, 10), "Set Window", font=oled._get_font('small'), fill="white")
-        draw.text((25, 30), f"< {duration:02d} min >", font=oled._get_font('large'), fill="white")
+        draw.text((20, 30), f"< {duration:02d} min >", font=oled._get_font('large'), fill="white")
 
     def _draw_set_target_time_screen(self, draw, oled, state_manager):
         temp_time = state_manager.temp_target_time
