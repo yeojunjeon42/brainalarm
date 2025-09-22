@@ -147,8 +147,8 @@ class OLED:
             
             # 3. Pillow 라이브러리를 사용하여 폰트를 로드합니다.
             # (경로는 실제 폰트 파일 위치에 맞게 수정해야 합니다.)
-            self.font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 12)
-            self.font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 24)
+            self.font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 10)
+            self.font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
             print("OLED 스크린이 성공적으로 초기화되었습니다.")
         except Exception as e:
             print(f"OLED 초기화 실패: {e}")

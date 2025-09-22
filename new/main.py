@@ -1,11 +1,10 @@
 # main.py
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import RPi.GPIO as GPIO
 import os
 import joblib
 from state_manager import StateManager
-from pytz import timezone
 
 # --- 필요한 모듈 임포트 ---
 # 각 파일에 실제 하드웨어 제어 클래스가 구현되어 있어야 합니다.
@@ -16,6 +15,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, 'models/sleep_stage_classifier.joblib')
 sleep_stage_model = joblib.load(MODEL_PATH)
 
+kst = timezone(timedelta(hours=9))
 def main():
     """메인 실행 함수"""
     # =================================================================
@@ -59,6 +59,8 @@ def main():
         # 2. 메인 루프 (Main Loop)
         # =================================================================
         while True:
+            alarm_triggered = False
+            current_sleep_stage = 0
             # --- 2.1. 입력 감지 (Input Gathering) ---
             # 사용자의 버튼 및 엔코더 조작을 확인합니다.
             if set_button.was_pressed():
@@ -72,10 +74,11 @@ def main():
                 state_manager.handle_rotation(encoder_change)
 
             # --- 2.2. 뇌파 분석 스레드 관리 (EEG Thread Management) ---
-            now_time = datetime.now().time()
+            now_time = datetime.now(kst).time()
             
             # StateManager로부터 현재 설정된 wake_window 시간을 계산합니다.
-            target_dt = datetime.combine(datetime.today(), state_manager.target_time)
+            # today_kst = datetime.now(kst).date()
+            target_dt = datetime.combine(datetime.now(kst).date(), state_manager.target_time)
             window_start_dt = target_dt - timedelta(minutes=state_manager.window_duration_minutes)
             window_start_time = window_start_dt.time()
             window_end_time = state_manager.target_time
@@ -102,6 +105,7 @@ def main():
             # --- 2.3. 상태 확인 및 로직 처리 (Logic Processing) ---
             # 스레드가 실행 중일 때만 뇌파를 확인하고 알람 조건을 체크합니다.
             if eeg_is_running and not state_manager.alarm_active:
+            #eeg 돌아가는 시작 시간 이후인지?
                 current_sleep_stage = eeg_processor.get_epoch_data(block=False)
                 alarm_triggered = state_manager.check_alarm_condition(current_sleep_stage)#설정 시간 되거나 N2면 트리거 on
                 
@@ -114,7 +118,7 @@ def main():
             # --- 2.4. 화면 출력 (Output Rendering) ---
             # 현재 상태에 맞는 화면을 그려달라고 Renderer에게 요청합니다.
             renderer.render(oled, state_manager)
-
+            print(datetime.now(kst).time(), state_manager.target_time)
             # --- 2.5. 처리 속도 조절 (Loop Delay) ---
             time.sleep(0.05)
 

@@ -1,6 +1,8 @@
 # state_manager.py
 from enum import Enum, auto
-from datetime import datetime, time, timedelta
+from datetime import datetime, time, timedelta, timezone
+
+kst = timezone(timedelta(hours=9))
 
 class State(Enum):
     """시계의 현재 상태를 나타냅니다."""
@@ -86,7 +88,7 @@ class StateManager:
 
     def _adjust_time(self, time_obj, change):
         """편집 모드(시/분)에 따라 시간을 조절하는 헬퍼 함수입니다."""
-        dt = datetime.combine(datetime.today(), time_obj)
+        dt = datetime.combine(datetime.now(kst).date(), time_obj)
         delta = timedelta(hours=change) if self.edit_mode == EditMode.HOUR else timedelta(minutes=change)
         return (dt + delta).time()
 
@@ -98,10 +100,11 @@ class StateManager:
         if self.alarm_active:
             return False
 
-        now = datetime.now()
+        now = datetime.now(kst)
         now_time = now.time()
 
         target_datetime = datetime.combine(now.date(), self.target_time)
+        target_datetime = target_datetime.replace(tzinfo=kst)
         window_start_datetime = target_datetime - timedelta(minutes=self.window_duration_minutes)
         calculated_window_start_time = window_start_datetime.time()
 
