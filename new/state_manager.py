@@ -128,7 +128,6 @@ class StateManager:
 
     def stop_alarm(self):
         """알람을 중지하고 관련 상태를 리셋합니다."""
-        if self.buzzer.is_active:
-            self.buzzer.stop()
+        self.buzzer.stop()
         self.alarm_active = False
         print("알람 중지됨.")
