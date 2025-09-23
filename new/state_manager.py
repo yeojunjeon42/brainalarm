@@ -32,8 +32,9 @@ class StateManager:
 
         # 최종 저장될 설정값
         self.window_duration_minutes = 30  # 기상 창 크기 (기본값: 30분)
-        self.target_time = time(7, 0)      # 최종 기상 시간 (기본값: 오전 7시)
-
+        #self.target_time = time(7, 0)      # 최종 기상 시간 (기본값: 오전 7시)
+        self.target_time = datetime.combine(datetime.now(kst).date(),time(7,0))+timedelta(days = 1) #기본값: 다음날 오전 7시
+        self.target_time = self.target_time.replace(tzinfo=kst)
         # 사용자가 편집 중인 값을 임시로 저장하는 변수
         self.temp_window_duration_minutes = self.window_duration_minutes
         self.temp_target_time = self.target_time
@@ -62,7 +63,11 @@ class StateManager:
             if self.edit_mode == EditMode.HOUR:
                 self.edit_mode = EditMode.MINUTE
             else: # '분' 편집 모드였을 경우
-                self.target_time = self.temp_target_time
+                # self.target_time = self.temp_target_time
+                self.target_time = datetime.combine(datetime.now(kst).date(),self.temp_target_time).replace(tzinfo=kst)
+                if datetime.now(kst).time() >= self.temp_target_time : 
+                    #현재 시각보다 늦다면 다음날 알람 설정
+                    self.target_time =self.target_time + timedelta(days = 1)
                 self.current_state = State.DISPLAY_TIME
                 self.edit_mode = EditMode.HOUR
 
@@ -103,13 +108,12 @@ class StateManager:
         now = datetime.now(kst)
         now_time = now.time()
 
-        target_datetime = datetime.combine(now.date(), self.target_time)
-        target_datetime = target_datetime.replace(tzinfo=kst)
+        target_datetime = self.target_time
         window_start_datetime = target_datetime - timedelta(minutes=self.window_duration_minutes)
-        calculated_window_start_time = window_start_datetime.time()
+        # calculated_window_start_time = window_start_datetime.time()
 
-        is_in_window = calculated_window_start_time <= now_time < self.target_time
-        is_target_time = now_time >= self.target_time
+        is_in_window = window_start_datetime <= now < self.target_time
+        is_target_time = now >= self.target_time
 
         # 조건 충족 시, 알람을 활성화하고 True를 반환하여 main.py에 알립니다.
         if is_target_time or (is_in_window and sleep_stage == 1): #N2면 1
