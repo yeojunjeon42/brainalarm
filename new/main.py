@@ -8,7 +8,7 @@ from state_manager import StateManager
 
 # --- 필요한 모듈 임포트 ---
 # 각 파일에 실제 하드웨어 제어 클래스가 구현되어 있어야 합니다.
-from hardware_handler import Buzzer, Button, RotaryEncoder, OLED
+from hardware_handler import Buzzer, Button, RotaryEncoder, OLED, PressType
 from eeg_handler import EEGReader
 from ui_renderer import UIRenderer
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -40,8 +40,7 @@ def main():
 
     # 각 모듈의 객체를 생성합니다.
     buzzer = Buzzer(BUZZER_PIN, RESET_BUTTON_PIN)
-    set_button = Button(SET_BUTTON_PIN)
-    reset_button = Button(RESET_BUTTON_PIN)
+    control_button = Button(RESET_BUTTON_PIN, long_press_duration=1.0)
     rotary_encoder = RotaryEncoder(ENCODER_CLK_PIN, ENCODER_DT_PIN)
     oled = OLED()
     
@@ -66,10 +65,14 @@ def main():
             current_sleep_stage = 0
             # --- 2.1. 입력 감지 (Input Gathering) ---
             # 사용자의 버튼 및 엔코더 조작을 확인합니다.
-            if set_button.was_pressed():
-                state_manager.handle_set_press()
+            button_event = control_button.get_event()
 
-            if reset_button.was_pressed():
+            if button_event == PressType.SHORT_PRESS:
+                # 짧게 누르면 'Set' 기능 수행
+                state_manager.handle_set_press()
+            
+            elif button_event == PressType.LONG_PRESS:
+                # 길게 누르면 'Reset' 기능 수행
                 state_manager.handle_reset_press()
             
             encoder_change = rotary_encoder.get_change()

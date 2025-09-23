@@ -14,31 +14,66 @@ VIBRATION_PIN = 27
 CLK = 17
 DT = 18
 
-#GPIO setup
-# GPIO.cleanup()
-# GPIO.setmode(GPIO.BCM)
-# GPIO.setup(BUZZER_PIN, GPIO.OUT)
-# GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
-# GPIO.setup(SET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-# GPIO.setup(VIBRATION_PIN, GPIO.OUT)
-# GPIO.setup(CLK, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
-# GPIO.setup(DT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+class PressType(Enum):
+    """버튼 누름의 종류를 정의합니다."""
+    NO_PRESS = 0
+    SHORT_PRESS = 1
+    LONG_PRESS = 2
 
-class Button:
-    def __init__(self, pin):
-        self.pin = pin
-        GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        self.last_state = GPIO.input(self.pin) #default state is high
+# class Button:
+#     def __init__(self, pin):
+#         self.pin = pin
+#         GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+#         self.last_state = GPIO.input(self.pin) #default state is high
     
-    def was_pressed(self):
-        current_state = GPIO.input(self.pin)
-        was_pressed = (self.last_state == 1 and current_state == 0)
-        self.last_state = current_state
-        return was_pressed
+#     def was_pressed(self):
+#         current_state = GPIO.input(self.pin)
+#         was_pressed = (self.last_state == 1 and current_state == 0)
+#         self.last_state = current_state
+#         return was_pressed
+class Button:
+    """짧게 누르기와 길게 누르기를 감지하는 버튼 클래스"""
+    def __init__(self, pin, long_press_duration=1.0):
+        self.pin = pin
+        self.long_press_duration = long_press_duration # 길게 누르기 시간 (기본값 1초)
+        
+        GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-import RPi.GPIO as GPIO
-import time
-import threading
+        self._last_state = GPIO.input(self.pin)
+        self._press_start_time = 0
+        self._long_press_triggered = False
+
+    def get_event(self):
+        """버튼의 상태를 확인하여 NO_PRESS, SHORT_PRESS, LONG_PRESS 이벤트를 반환합니다."""
+        event = PressType.NO_PRESS
+        current_state = GPIO.input(self.pin)
+
+        # 버튼이 막 눌렸을 때 (Falling edge)
+        if current_state == 0 and self._last_state == 1:
+            self._press_start_time = time.time()
+            self._long_press_triggered = False
+
+        # 버튼이 계속 눌리고 있을 때
+        elif current_state == 0 and self._last_state == 0:
+            if not self._long_press_triggered:
+                press_duration = time.time() - self._press_start_time
+                if press_duration >= self.long_press_duration:
+                    event = PressType.LONG_PRESS
+                    self._long_press_triggered = True
+
+        # 버튼에서 손을 뗐을 때 (Rising edge)
+        elif current_state == 1 and self._last_state == 0:
+            # 길게 누르기가 발동되지 않았을 경우에만 짧게 누르기로 간주
+            if not self._long_press_triggered:
+                event = PressType.SHORT_PRESS
+            
+            # 다음 입력을 위해 상태 초기화
+            self._press_start_time = 0
+            self._long_press_triggered = False
+
+        self._last_state = current_state
+        return event
+
 
 class RotaryEncoder:
     """
