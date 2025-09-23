@@ -93,7 +93,11 @@ class StateManager:
 
     def _adjust_time(self, time_obj, change):
         """편집 모드(시/분)에 따라 시간을 조절하는 헬퍼 함수입니다."""
-        dt = datetime.combine(datetime.now(kst).date(), time_obj)
+        if isinstance(time_obj, datetime):
+            current_time = time_obj.time()
+        else:
+            current_time = time_obj
+        dt = datetime.combine(datetime.now(kst).date(), current_time)
         delta = timedelta(hours=change) if self.edit_mode == EditMode.HOUR else timedelta(minutes=change)
         return (dt + delta).time()
 
