@@ -34,9 +34,9 @@ class PressType(Enum):
 #         return was_pressed
 class Button:
     """짧게 누르기와 길게 누르기를 감지하는 버튼 클래스"""
-    def __init__(self, pin, long_press_duration=1.0):
+    def __init__(self, pin, long_press_duration=2.0):
         self.pin = pin
-        self.long_press_duration = long_press_duration # 길게 누르기 시간 (기본값 1초)
+        self.long_press_duration = long_press_duration # 길게 누르기 시간 (기본값 2초)
         
         GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 

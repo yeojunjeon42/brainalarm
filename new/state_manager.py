@@ -37,7 +37,7 @@ class StateManager:
         self.target_time = self.target_time.replace(tzinfo=kst)
         # 사용자가 편집 중인 값을 임시로 저장하는 변수
         self.temp_window_duration_minutes = self.window_duration_minutes
-        self.temp_target_time = self.target_time
+        self.temp_target_time = self.target_time.time()
         
         # 알람이 활성화되었는지 나타내는 플래그
         self.alarm_active = False
