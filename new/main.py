@@ -88,7 +88,6 @@ def main():
 
             # 현재 시간이 wake_window 안에 있는지 확인합니다.
             is_in_window = window_start_dt <= now < window_end_time
-            over_time = now >= window_end_time
             eeg_is_running = eeg_processor.is_running()
 
             # --- 스레드 시작 조건 ---
@@ -101,7 +100,6 @@ def main():
             # --- 2.3. 상태 확인 및 로직 처리 (Logic Processing) ---
             # 스레드가 실행 중일 때만 뇌파를 확인하고 알람 조건을 체크합니다.
             if eeg_is_running and not state_manager.alarm_active:
-            #eeg 돌아가는 시작 시간 이후인지?
                 current_sleep_stage = eeg_processor.get_epoch_data(block=False)
                 alarm_triggered = state_manager.check_alarm_condition(current_sleep_stage)#설정 시간 되거나 N2면 트리거 on
                 
