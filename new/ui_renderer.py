@@ -40,7 +40,7 @@ class UIRenderer:
 
     def _draw_alarm_screen(self, draw, oled):
         now_str = datetime.now(kst).strftime('%H:%M:%S')
-        draw.text((15, 10), "WAKE UP!", font=oled._get_font('large'), fill="white")
+        draw.text((12, 10), "WAKE UP!", font=oled._get_font('large'), fill="white")
         draw.text((40, 40), now_str, font=oled._get_font('small'), fill="white")
         # wake_up_text = "WAKE UP!"
         # wake_up_font = oled._get_font('large')
