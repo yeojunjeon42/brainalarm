@@ -18,7 +18,7 @@ try:
         button_state = GPIO.input(BUTTON_PIN)
         
         # bình thường là 1, nút bấm là 0
-        if button_state == 0:
+        if button_state == 1:
             print("버튼 눌림 (상태: 0)")
         else:
             print("버튼 안 눌림 (상태: 1)")
