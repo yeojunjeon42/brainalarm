@@ -43,7 +43,7 @@ try:
         sw_state = GPIO.input(SW_PIN)
         
         # 버튼이 눌렸고(sw_state == 0), 마지막으로 눌린 후 0.2초가 지났다면
-        if sw_state == 1 and (time.time() - last_press_time) > DEBOUNCE_DELAY:
+        if sw_state == 0 and (time.time() - last_press_time) > DEBOUNCE_DELAY:
             print("버튼이 눌렸습니다!")
             last_press_time = time.time() # 마지막으로 눌린 시간을 현재 시간으로 업데이트
 
