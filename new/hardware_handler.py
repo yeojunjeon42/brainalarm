@@ -37,6 +37,8 @@ class Button:
     def __init__(self, pin, long_press_duration=2.0):
         self.pin = pin
         self.long_press_duration = long_press_duration # 길게 누르기 시간 (기본값 2초)
+        self.debounce_time = 0.2 # 디바운싱 시간 (기본값 0.2초)
+        self._last_event_time = 0          # 마지막으로 유효한 이벤트가 발생한 시간
         
         GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
@@ -48,25 +50,29 @@ class Button:
         """버튼의 상태를 확인하여 NO_PRESS, SHORT_PRESS, LONG_PRESS 이벤트를 반환합니다."""
         event = PressType.NO_PRESS
         current_state = GPIO.input(self.pin)
+        now = time.time() # 현재 시간을 한 번만 호출하여 사용
 
         # 버튼이 막 눌렸을 때 (Falling edge)
         if current_state == 0 and self._last_state == 1:
-            self._press_start_time = time.time()
-            self._long_press_triggered = False
+            # 마지막 이벤트로부터 충분한 시간이 지났을 때만 새 입력을 시작
+            if now - self._last_event_time > self.debounce_time:
+                self._press_start_time = now
+                self._long_press_triggered = False
 
         # 버튼이 계속 눌리고 있을 때
-        elif current_state == 0 and self._last_state == 0:
+        elif current_state == 0 and self._last_state == 0 and self._press_start_time > 0:
             if not self._long_press_triggered:
-                press_duration = time.time() - self._press_start_time
+                press_duration = now - self._press_start_time
                 if press_duration >= self.long_press_duration:
                     event = PressType.LONG_PRESS
                     self._long_press_triggered = True
+                    self._last_event_time = now # 유효 이벤트 시간 기록
 
         # 버튼에서 손을 뗐을 때 (Rising edge)
-        elif current_state == 1 and self._last_state == 0:
-            # 길게 누르기가 발동되지 않았을 경우에만 짧게 누르기로 간주
+        elif current_state == 1 and self._last_state == 0 and self._press_start_time > 0:
             if not self._long_press_triggered:
                 event = PressType.SHORT_PRESS
+                self._last_event_time = now # 유효 이벤트 시간 기록
             
             # 다음 입력을 위해 상태 초기화
             self._press_start_time = 0
