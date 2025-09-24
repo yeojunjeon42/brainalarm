@@ -77,31 +77,29 @@ def main():
                 state_manager.handle_rotation(encoder_change)
 
             # --- 2.2. 뇌파 분석 스레드 관리 (EEG Thread Management) ---
-            now_time = datetime.now(kst).time()
+            now = datetime.now(kst)
             
             # StateManager로부터 현재 설정된 wake_window 시간을 계산합니다.
             # today_kst = datetime.now(kst).date()
-            target_dt = datetime.combine(datetime.now(kst).date(), state_manager.target_time)
+            target_dt = state_manager.target_time
             window_start_dt = target_dt - timedelta(minutes=state_manager.window_duration_minutes)
-            window_start_time = window_start_dt.time()
+            # window_start_time = window_start_dt.time()
             window_end_time = state_manager.target_time
 
             # 현재 시간이 wake_window 안에 있는지 확인합니다.
-            is_in_window = window_start_time <= now_time < window_end_time
-            over_time = now_time >= window_end_time
+            is_in_window = window_start_dt <= now < window_end_time
             eeg_is_running = eeg_processor.is_running()
 
             # --- 스레드 시작 조건 ---
             # 창 안에 있고, 알람이 울리지 않으며, 스레드가 꺼져 있을 때
             if is_in_window and not state_manager.alarm_active and not eeg_is_running:
-                print(f"Wake window 시작({window_start_time.strftime('%H:%M')}). 뇌파 분석을 시작합니다.")
+                print(f"Wake window 시작({window_start_dt.time().strftime('%H:%M')}). 뇌파 분석을 시작합니다.")
                 eeg_processor.start_collection()
 
 
             # --- 2.3. 상태 확인 및 로직 처리 (Logic Processing) ---
             # 스레드가 실행 중일 때만 뇌파를 확인하고 알람 조건을 체크합니다.
             if eeg_is_running and not state_manager.alarm_active:
-            #eeg 돌아가는 시작 시간 이후인지?
                 current_sleep_stage = eeg_processor.get_epoch_data(block=False)
                 alarm_triggered = state_manager.check_alarm_condition(current_sleep_stage)#설정 시간 되거나 N2면 트리거 on
                 
@@ -131,7 +129,7 @@ def main():
             # --- 2.4. 화면 출력 (Output Rendering) ---
             # 현재 상태에 맞는 화면을 그려달라고 Renderer에게 요청합니다.
             renderer.render(oled, state_manager)
-            print(datetime.now(kst).time(), state_manager.target_time)
+            print(datetime.now(kst).time(), state_manager.target_time.time())
             # --- 2.5. 처리 속도 조절 (Loop Delay) ---
             time.sleep(0.05)
 
