@@ -1,7 +1,8 @@
 import serial
 import time
+import statistics
 
-def parse_tgam_packet(packet):
+def parse_tgam_packet(packet, raw_data_buffer, attention_value, meditation_value):
     """
     완성된 TGAM 데이터 패킷을 입력받아 분석하고 출력합니다.
     패킷 구조: [SYNC, SYNC, PLENGTH, PAYLOAD..., CHECKSUM]
@@ -31,15 +32,15 @@ def parse_tgam_packet(packet):
             
             elif code == 0x04: # Attention (집중도)
                 if i < len(payload):
-                    attention = payload[i]
+                    attention_value[0] = payload[i]
                     i += 1
-                    print(f"  -> 집중도: {attention}")
+                    print(f"  -> 집중도: {attention_value[0]}")
             
             elif code == 0x05: # Meditation (명상도)
                 if i < len(payload):
-                    meditation = payload[i]
+                    meditation_value[0] = payload[i]
                     i += 1
-                    print(f"  -> 명상도: {meditation}")
+                    print(f"  -> 명상도: {meditation_value[0]}")
             
             elif code == 0x80: # Raw Wave Value (원본 뇌파 데이터)
                 if i + 1 < len(payload):
@@ -49,8 +50,8 @@ def parse_tgam_packet(packet):
                     if raw_wave >= 32768:
                         raw_wave -= 65536
                     i += 2
-                    # 원본 데이터는 매우 빠르게 출력되므로 필요할 때 주석을 해제하여 사용하세요.
-                    # print(f"Raw Wave: {raw_wave}")
+                    # 원본 데이터를 버퍼에 저장 (512Hz 샘플링)
+                    raw_data_buffer.append(raw_wave)
 
             elif code == 0x83: # EEG Power (각 뇌파 대역별 세기)
                 # 이 값들은 뇌파 분석에 중요하게 사용됩니다.
@@ -68,11 +69,18 @@ if __name__ == "__main__":
     PORT_NAME = '/dev/rfcomm0'
     BAUD_RATE = 57600
     
+    # 데이터 버퍼 및 변수 초기화
+    raw_data_buffer = []
+    attention_value = [0]  # 리스트로 사용하여 참조 전달
+    meditation_value = [0]  # 리스트로 사용하여 참조 전달
+    last_mean_time = time.time()
+    
     ser = None # 시리얼 객체 초기화
     try:
         # 시리얼 포트 연결 (timeout을 1초로 설정하여 무한 대기 방지)
         ser = serial.Serial(PORT_NAME, BAUD_RATE, timeout=1)
         print(f"{PORT_NAME}에 연결되었습니다. 데이터 수신을 시작합니다...")
+        print("0.5초마다 Raw Data 평균값, Attention, Meditation을 출력합니다.")
         
         packet_buffer = []
         
@@ -113,13 +121,28 @@ if __name__ == "__main__":
                         full_packet = [0xAA, 0xAA, plength] + list(payload_and_checksum)
                         
                         # 패킷 분석 함수 호출
-                        parse_tgam_packet(full_packet)
+                        parse_tgam_packet(full_packet, raw_data_buffer, attention_value, meditation_value)
                     
                     # 다음 패킷을 위해 버퍼 초기화
                     packet_buffer.clear()
             else:
                 # 동기 바이트를 찾는 과정이므로 버퍼를 계속 비워줌
                 packet_buffer.clear()
+            
+            # 0.5초마다 Raw Data 평균값 계산 및 출력
+            current_time = time.time()
+            if current_time - last_mean_time >= 0.5:
+                if raw_data_buffer:
+                    # 0.5초 동안의 Raw Data 평균값 계산 (512Hz * 0.5s = 256 샘플)
+                    mean_raw = statistics.mean(raw_data_buffer)
+                    print(f"Raw Data 평균: {mean_raw:.2f}, Attention: {attention_value[0]}, Meditation: {meditation_value[0]}")
+                    
+                    # 버퍼 초기화 (다음 0.5초를 위해)
+                    raw_data_buffer.clear()
+                else:
+                    print(f"Raw Data 평균: N/A, Attention: {attention_value[0]}, Meditation: {meditation_value[0]}")
+                
+                last_mean_time = current_time
 
     except serial.SerialException as e:
         print(f"시리얼 포트 오류가 발생했습니다: {e}")
