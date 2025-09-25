@@ -40,18 +40,16 @@ def parse_tgam_packet(packet, raw_data_buffer, attention_value, meditation_value
                     meditation_value[0] = payload[i]
                     i += 1
             
-            # elif code == 0x80: # Raw Wave Value (원본 뇌파 데이터)
-            #     if i + 1 < len(payload):
-            #         raw_high = payload[i]
-            #         raw_low = payload[i+1]
-            #         raw_wave = (raw_high << 8) | raw_low
-            #         if raw_wave >= 32768:
-            #             raw_wave -= 65536
-            #         i += 2
-            #         # 원본 데이터를 버퍼에 저장 (512Hz 샘플링)
-            #         raw_data_buffer.append(raw_wave)
-            #         # Raw 신호를 실시간으로 출력
-            #         print(f"\nRaw Wave: {raw_wave}")
+            elif code == 0x80: # Raw Wave Value (원본 뇌파 데이터)
+                if i + 1 < len(payload):
+                    raw_high = payload[i]
+                    raw_low = payload[i+1]
+                    raw_wave = (raw_high << 8) | raw_low
+                    if raw_wave >= 32768:
+                        raw_wave -= 65536
+                    i += 2
+                    # 원본 데이터를 버퍼에 저장 (512Hz 샘플링)
+                    raw_data_buffer.append(raw_wave)
 
             elif code == 0x83: # EEG Power (각 뇌파 대역별 세기)
                 # 이 값들은 뇌파 분석에 중요하게 사용됩니다.
@@ -81,8 +79,7 @@ if __name__ == "__main__":
         ser = serial.Serial(PORT_NAME, BAUD_RATE, timeout=1)
         print(f"{PORT_NAME}에 연결되었습니다. 데이터 수신을 시작합니다...")
         print("실시간 데이터 모니터링:")
-        print("Raw Wave: 실시간 출력")
-        print("평균값 및 Attention/Meditation: --, Attention: --, Meditation: --", end="", flush=True)
+        print("0.5초마다 Raw Data 평균값, Attention, Meditation을 출력합니다.")
         
         packet_buffer = []
         
@@ -137,13 +134,12 @@ if __name__ == "__main__":
                 if raw_data_buffer:
                     # 0.5초 동안의 Raw Data 평균값 계산 (512Hz * 0.5s = 256 샘플)
                     mean_raw = statistics.mean(raw_data_buffer)
-                    # 같은 줄에서 값을 업데이트 (캐리지 리턴으로 줄의 시작으로 이동)
-                    print(f"\r평균값 및 Attention/Meditation: {mean_raw:.2f}, Attention: {attention_value[0]}, Meditation: {meditation_value[0]}", end="", flush=True)
+                    print(f"Raw Data 평균: {mean_raw:.2f}, Attention: {attention_value[0]}, Meditation: {meditation_value[0]}")
                     
                     # 버퍼 초기화 (다음 0.5초를 위해)
                     raw_data_buffer.clear()
                 else:
-                    print(f"\r평균값 및 Attention/Meditation: N/A, Attention: {attention_value[0]}, Meditation: {meditation_value[0]}", end="", flush=True)
+                    print(f"Raw Data 평균: N/A, Attention: {attention_value[0]}, Meditation: {meditation_value[0]}")
                 
                 last_mean_time = current_time
 
