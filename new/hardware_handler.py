@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
 import time
+from enum import Enum
 from luma.core.interface.serial import i2c
 from luma.core.render import canvas
 from luma.oled.device import ssd1306
@@ -14,31 +15,72 @@ VIBRATION_PIN = 27
 CLK = 17
 DT = 18
 
-#GPIO setup
-# GPIO.cleanup()
-# GPIO.setmode(GPIO.BCM)
-# GPIO.setup(BUZZER_PIN, GPIO.OUT)
-# GPIO.setup(RESET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) #pull up config
-# GPIO.setup(SET_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-# GPIO.setup(VIBRATION_PIN, GPIO.OUT)
-# GPIO.setup(CLK, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
-# GPIO.setup(DT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+class PressType(Enum):
+    """버튼 누름의 종류를 정의합니다."""
+    NO_PRESS = 0
+    SHORT_PRESS = 1
+    LONG_PRESS = 2
 
-class Button:
-    def __init__(self, pin):
-        self.pin = pin
-        GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        self.last_state = GPIO.input(self.pin) #default state is high
+# class Button:
+#     def __init__(self, pin):
+#         self.pin = pin
+#         GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+#         self.last_state = GPIO.input(self.pin) #default state is high
     
-    def was_pressed(self):
-        current_state = GPIO.input(self.pin)
-        was_pressed = (self.last_state == 1 and current_state == 0)
-        self.last_state = current_state
-        return was_pressed
+#     def was_pressed(self):
+#         current_state = GPIO.input(self.pin)
+#         was_pressed = (self.last_state == 1 and current_state == 0)
+#         self.last_state = current_state
+#         return was_pressed
+class Button:
+    """짧게 누르기와 길게 누르기를 감지하는 버튼 클래스"""
+    def __init__(self, pin, long_press_duration=2.0):
+        self.pin = pin
+        self.long_press_duration = long_press_duration # 길게 누르기 시간 (기본값 2초)
+        self.debounce_time = 0.2 # 디바운싱 시간 (기본값 0.2초)
+        self._last_event_time = 0          # 마지막으로 유효한 이벤트가 발생한 시간
+        
+        GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-import RPi.GPIO as GPIO
-import time
-import threading
+        self._last_state = GPIO.input(self.pin)
+        self._press_start_time = 0
+        self._long_press_triggered = False
+
+    def get_event(self):
+        """버튼의 상태를 확인하여 NO_PRESS, SHORT_PRESS, LONG_PRESS 이벤트를 반환합니다."""
+        event = PressType.NO_PRESS
+        current_state = GPIO.input(self.pin)
+        now = time.time() # 현재 시간을 한 번만 호출하여 사용
+
+        # 버튼이 막 눌렸을 때 (Falling edge)
+        if current_state == 0 and self._last_state == 1:
+            # 마지막 이벤트로부터 충분한 시간이 지났을 때만 새 입력을 시작
+            if now - self._last_event_time > self.debounce_time:
+                self._press_start_time = now
+                self._long_press_triggered = False
+
+        # 버튼이 계속 눌리고 있을 때
+        elif current_state == 0 and self._last_state == 0 and self._press_start_time > 0:
+            if not self._long_press_triggered:
+                press_duration = now - self._press_start_time
+                if press_duration >= self.long_press_duration:
+                    event = PressType.LONG_PRESS
+                    self._long_press_triggered = True
+                    self._last_event_time = now # 유효 이벤트 시간 기록
+
+        # 버튼에서 손을 뗐을 때 (Rising edge)
+        elif current_state == 1 and self._last_state == 0 and self._press_start_time > 0:
+            if not self._long_press_triggered:
+                event = PressType.SHORT_PRESS
+                self._last_event_time = now # 유효 이벤트 시간 기록
+            
+            # 다음 입력을 위해 상태 초기화
+            self._press_start_time = 0
+            self._long_press_triggered = False
+
+        self._last_state = current_state
+        return event
+
 
 class RotaryEncoder:
     """
